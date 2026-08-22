@@ -39,7 +39,7 @@ export class Store {
     typeof window !== 'undefined' && window.localStorage ? window.localStorage : new MemStore();
 
   static get length(): number {
-    return this.store.size;
+    return this.store.length;
   }
 
   static clear(): void {
@@ -55,10 +55,10 @@ export class Store {
   }
 
   static removeItem(key: string): void {
-    this.store.delete(key);
+    this.store.removeItem(key);
   }
 
   static setItem(key: string, value: string): void {
-    this.store.set(key, String(value));
+    this.store.setItem(key, String(value));
   }
 }

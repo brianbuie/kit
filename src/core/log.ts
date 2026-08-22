@@ -40,6 +40,11 @@ export type LogEntry = {
   details?: unknown;
 };
 
+export type LogFormatters = {
+  prettyMessage: (entry: LogEntry) => string;
+  prettyDetails: (entry: LogEntry) => string;
+};
+
 /**
  * Levels: TRACE, DEBUG, INFO, WARN, ERROR, ALERT.
  * Use `LOG_LEVL=INFO` to limit what's printed to console
@@ -51,6 +56,10 @@ export class Log {
   static silent = false;
   static minLevel =
     Env.var('LOG_LEVEL') !== undefined ? LogLevels[Env.var('LOG_LEVEL') as LogLevel] : Env.isProd ? 2 : 1;
+  static formatters: LogFormatters = {
+    prettyMessage: ({ level, message }: LogEntry) => `${Format.date('h:m:s')} [${level}] ${message || ''}`,
+    prettyDetails: ({ details }: LogEntry) => JSON.stringify(details, null, 2),
+  };
 
   /**
    * Handle first argument being a string or an object with a 'message' or 'msg' prop
@@ -75,55 +84,47 @@ export class Log {
     console.log(JSON.stringify(snapshot({ message, details, severity: GcloudSeverity[level] })));
   };
 
-  protected static prettyMessage = ({ level, message }: LogEntry): string => {
-    return `${Format.date('h:m:s')} [${level}] ${message || ''}`;
-  };
-
-  protected static prettyDetails = ({ details }: LogEntry) => {
-    return JSON.stringify(details, null, 2);
-  };
-
   protected static toPretty = (entry: LogEntry): void => {
-    if (entry.message) console.log(this.prettyMessage(entry));
-    if (entry.details) console.log(this.prettyDetails(entry));
+    if (entry.message) console.log(this.formatters.prettyMessage(entry));
+    if (entry.details) console.log(this.formatters.prettyDetails(entry));
   };
 
   protected static write = (level: LogLevel, input: LogArgs): void => {
-    const entry = this.parseInput(level, input);
-    if (this.silent || LogLevels[level] < this.minLevel) return;
-    if (this.isBrowser) return this.toBrowser(entry);
-    if (this.isGcloud) return this.toGcloud(entry);
-    if (!this.isProd) return this.toPretty(entry);
+    const entry = Log.parseInput(level, input);
+    if (Log.silent || LogLevels[level] < Log.minLevel) return;
+    if (Log.isBrowser) return Log.toBrowser(entry);
+    if (Log.isGcloud) return Log.toGcloud(entry);
+    if (!Log.isProd) return Log.toPretty(entry);
     console.log(JSON.stringify(entry));
   };
 
   /**
    * trace information (never logged in gcloud)
    */
-  static trace = (...input: LogArgs): void => this.write('TRACE', input);
+  static trace = (...input: LogArgs): void => Log.write('TRACE', input);
 
   /**
    * Debug info (only logged in development)
    */
-  static debug = (...input: LogArgs): void => this.write('DEBUG', input);
+  static debug = (...input: LogArgs): void => Log.write('DEBUG', input);
 
   /**
    * Routine information, such as ongoing status or performance
    */
-  static info = (...input: LogArgs): void => this.write('INFO', input);
+  static info = (...input: LogArgs): void => Log.write('INFO', input);
 
   /**
    * Events that might cause problems
    */
-  static warn = (...input: LogArgs): void => this.write('WARN', input);
+  static warn = (...input: LogArgs): void => Log.write('WARN', input);
 
   /**
    * Events that cause problems
    */
-  static error = (...input: LogArgs): void => this.write('ERROR', input);
+  static error = (...input: LogArgs): void => Log.write('ERROR', input);
 
   /**
    * Events that require action or attention immediately.
    */
-  static alert = (...input: LogArgs): void => this.write('ALERT', input);
+  static alert = (...input: LogArgs): void => Log.write('ALERT', input);
 }
