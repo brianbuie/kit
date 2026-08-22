@@ -1,5 +1,4 @@
-import { describe, it, afterEach } from 'node:test';
-import assert from 'node:assert';
+import { describe, it, afterEach, assert } from 'vitest';
 import { Env } from './env.ts';
 
 describe('Env', () => {

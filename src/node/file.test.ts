@@ -1,5 +1,4 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
+import { describe, it, assert } from 'vitest';
 import { temp } from './dir.ts';
 import { File } from './file.ts';
 

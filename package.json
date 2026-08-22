@@ -6,7 +6,7 @@
   "author": "Brian Buie <brian@buie.dev>",
   "scripts": {
     "build": "prettier ./src -w && tsdown",
-    "test:src": "tsc && node --test \"src/**/*.test.ts\" --quiet",
+    "test:src": "tsc && vitest run",
     "test:pack": "pnpm pack --out .temp/kit.tgz && attw .temp/kit.tgz --profile esm-only",
     "test": "pnpm test:src && pnpm build && pnpm test:pack",
     "preversion": "pnpm test",

@@ -1,5 +1,4 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
+import { describe, it, assert } from 'vitest';
 import { temp, Dir } from './dir.ts';
 
 describe('Dir', () => {

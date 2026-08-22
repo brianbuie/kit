@@ -60,6 +60,10 @@ export default config;
 ## 3.0.0
 
 - Platform neutral export renamed to `@brianbuie/kit/core`
+- `Cache` option for save location is now `dir` (was `path`).
+  - Breaking: Defaults to in-memory store if `dir` is not provided
+  - Can be used in the browser now (uses local storage)
+- `Log` can be used in browser
 
 ## 2.0.7
 
