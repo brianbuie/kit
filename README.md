@@ -11,7 +11,19 @@ npm add @brianbuie/kit
 ```
 
 ```ts
-import { Fetcher, Log } from '@brianbuie/kit';
+import { Fetcher } from '@brianbuie/kit';
+```
+
+Consumers should get the correct modules when importing from `@brianbuie/kit`. If you run into issues with node.js's modules being bundled for the browser, you can import from `@brianbuie/kit/core` instead.
+
+```ts
+import { Fetcher } from '@brianbuie/kit/core';
+```
+
+The `TypeWriter` module is separate from the main export and needs `quicktype-core` installed as a peer dependency.
+
+```ts
+import { TypeWriter } from '@brianbuie/kit/type-writer';
 ```
 
 ## Extending Config
@@ -45,13 +57,13 @@ export default config;
 
 # Changelog
 
+## 3.0.0
+
+- Platform neutral export renamed to `@brianbuie/kit/core`
+
 ## 2.0.7
 
 - Fix incorrect export for `@brianbuie/kit/neutral`
-
-## 2.0.6
-
-- Switch to pnpm
 
 ## 2.0.5
 

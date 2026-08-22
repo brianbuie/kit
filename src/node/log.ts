@@ -1,8 +1,8 @@
 import { inspect } from 'node:util';
 import { isObjectLike } from 'lodash-es';
 import chalk, { type ChalkInstance } from 'chalk';
-import { snapshot } from './snapshot.ts';
-import { Format } from './format.ts';
+import { snapshot } from '../core/snapshot.ts';
+import { Format } from '../core/format.ts';
 
 /**
  * Loosely based on Google's [LogSeverity](https://docs.cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#logseverity),

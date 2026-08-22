@@ -1,5 +1,5 @@
-import { Cmd } from '../cmd.ts';
-import { FileBase } from './base.ts';
+import { Cmd } from './cmd.ts';
+import { FileBase } from './file-base.ts';
 
 export type VideoDimensions = {
   width: number;

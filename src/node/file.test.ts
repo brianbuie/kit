@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { temp } from '../dir.ts';
+import { temp } from './dir.ts';
 import { File } from './file.ts';
 
 const testDir = temp.tempDir('file-test');

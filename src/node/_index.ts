@@ -1,4 +1,4 @@
-export * from './_neutral.ts';
+export * from '../core/_index.ts';
 export { Cache, type CacheOptions } from './cache.ts';
 export { Cmd, type CmdArgs } from './cmd.ts';
 export { Dir, type DirOptions, temp, cwd } from './dir.ts';
@@ -12,4 +12,4 @@ export {
   FileVideo,
   type FileCsvOptions,
   type VideoDimensions,
-} from './file/file.ts';
+} from './file.ts';

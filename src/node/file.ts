@@ -1,9 +1,9 @@
-import { FileBase } from './base.ts';
-import { FileCsv, type FileCsvOptions } from './csv.ts';
-import { FileImage } from './image.ts';
-import { FileJson } from './json.ts';
-import { FileNdjson } from './ndjson.ts';
-import { FileVideo } from './video.ts';
+import { FileBase } from './file-base.ts';
+import { FileCsv, type FileCsvOptions } from './file-csv.ts';
+import { FileImage } from './file-image.ts';
+import { FileJson } from './file-json.ts';
+import { FileNdjson } from './file-ndjson.ts';
+import { FileVideo } from './file-video.ts';
 
 /**
  * Represents a file on the file system. If the file doesn't exist, it is created the first time it is written to.
@@ -81,8 +81,8 @@ export class File extends FileBase {
   }
 }
 
-export { FileCsv, type FileCsvOptions } from './csv.ts';
-export { FileImage } from './image.ts';
-export { FileJson } from './json.ts';
-export { FileNdjson } from './ndjson.ts';
-export { FileVideo, type VideoDimensions } from './video.ts';
+export { FileCsv, type FileCsvOptions } from './file-csv.ts';
+export { FileImage } from './file-image.ts';
+export { FileJson } from './file-json.ts';
+export { FileNdjson } from './file-ndjson.ts';
+export { FileVideo, type VideoDimensions } from './file-video.ts';

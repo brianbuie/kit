@@ -6,9 +6,10 @@
   "author": "Brian Buie <brian@buie.dev>",
   "scripts": {
     "build": "prettier ./src -w && tsdown",
-    "test": "tsc && node --test \"src/**/*.test.ts\" --quiet",
-    "test:pack": "pnpm pack --out .pack/kit.tgz && attw .pack/kit.tgz --profile esm-only",
-    "preversion": "pnpm test && pnpm run build && pnpm test:pack",
+    "test:src": "tsc && node --test \"src/**/*.test.ts\" --quiet",
+    "test:pack": "pnpm pack --out .temp/kit.tgz && attw .temp/kit.tgz --profile esm-only",
+    "test": "pnpm test:src && pnpm build && pnpm test:pack",
+    "preversion": "pnpm test",
     "postversion": "git push --follow-tags"
   },
   "dependencies": {
@@ -46,11 +47,11 @@
     ".": {
       "types": "./dist/node.d.mts",
       "node": "./dist/node.mjs",
-      "default": "./dist/neutral.js"
+      "default": "./dist/core.js"
     },
-    "./neutral": {
-      "types": "./dist/neutral.d.ts",
-      "default": "./dist/neutral.js"
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "default": "./dist/core.js"
     },
     "./type-writer": {
       "types": "./dist/type-writer.d.mts",

@@ -1,5 +1,5 @@
 import probeImageSize from 'probe-image-size';
-import { FileBase } from './base.ts';
+import { FileBase } from './file-base.ts';
 
 export type ImageDimensions = {
   width: number;
