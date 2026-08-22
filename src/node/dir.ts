@@ -10,21 +10,20 @@ export type DirOptions = {
 
 /**
  * Reference to a specific directory with methods to create and list files.
- * @param inputPath
- * The path of the directory, created on file system the first time `.path` is read or any methods are used. Default: `./YYYYMMDD`
+ * @param where
+ * The path of the directory (relative to cwd or absolute).
+ * The directory is created on file system the first time `.path` is read or any methods are used. Default: `./YYYYMMDD`.
+ * If you need the path, but don't want to create the directory yet, use `.pathUnsafe` (unsafe because it might not exist)
  * @param options
  * include `{ temp: true }` to enable the `.clear()` method
  */
 export class Dir {
-  #inputPath: string;
-  #resolved?: string;
+  protected inputPath: string;
+  protected resolved?: string;
   isTemp: boolean;
 
-  /**
-   * @param path can be relative to workspace or absolute
-   */
-  constructor(inputPath = Format.date('ymd'), options: DirOptions = {}) {
-    this.#inputPath = inputPath;
+  constructor(where = Format.date('ymd'), options: DirOptions = {}) {
+    this.inputPath = where;
     this.isTemp = Boolean(options.temp);
   }
 
@@ -32,15 +31,15 @@ export class Dir {
    * The path of the directory, which might not exist yet.
    */
   get pathUnsafe(): string {
-    if (this.#resolved) return this.#resolved;
-    if (this.#inputPath[0] === '~') {
+    if (this.resolved) return this.resolved;
+    if (this.inputPath[0] === '~') {
       if (process.env.HOME) {
-        return path.join(process.env.HOME, this.#inputPath.slice(1));
+        return path.join(process.env.HOME, this.inputPath.slice(1));
       } else {
         console.warn('process.env.HOME does not exist! "~" will not resolve to home directory');
       }
     }
-    return path.resolve(this.#inputPath);
+    return path.resolve(this.inputPath);
   }
 
   /**
@@ -49,11 +48,11 @@ export class Dir {
    */
   get path(): string {
     // avoids calling mkdir every time path is read
-    if (!this.#resolved) {
-      this.#resolved = this.pathUnsafe;
-      fs.mkdirSync(this.#resolved, { recursive: true });
+    if (!this.resolved) {
+      this.resolved = this.pathUnsafe;
+      fs.mkdirSync(this.resolved, { recursive: true });
     }
-    return this.#resolved;
+    return this.resolved;
   }
 
   /**
@@ -204,6 +203,7 @@ export class Dir {
  * Current working directory
  */
 export const cwd = new Dir('./');
+
 /**
  * ./.temp in current working directory
  */
