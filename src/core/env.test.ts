@@ -23,6 +23,15 @@ describe('Env', () => {
     assert.equal(Env.var('TEST_ENV_VALUE'), undefined);
   });
 
+  it('requires environment variables when requested', () => {
+    process.env.TEST_REQUIRED_ENV_VALUE = 'value';
+    const value: string = Env.var('TEST_REQUIRED_ENV_VALUE', true);
+    assert.equal(value, 'value');
+
+    delete process.env.TEST_REQUIRED_ENV_VALUE;
+    assert.throws(() => Env.var('TEST_REQUIRED_ENV_VALUE', true));
+  });
+
   it('detects production mode dynamically', () => {
     process.env.NODE_ENV = 'production';
     assert.equal(Env.isProd, true);

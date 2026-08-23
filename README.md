@@ -57,6 +57,10 @@ export default config;
 
 # Changelog
 
+## 3.0.1
+
+- `Env.var` can be called with a second argument for `required`, to throw when not found.
+
 ## 3.0.0
 
 - Platform neutral export renamed to `@brianbuie/kit/core`
