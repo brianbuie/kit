@@ -1,3 +1,5 @@
+import { Env } from './env.ts';
+
 export class MemStore implements Storage {
   private store: Map<string, string> = new Map();
 
@@ -35,8 +37,7 @@ export class MemStore implements Storage {
  * const result = Store.getItem('key'); // 'value'
  */
 export class Store {
-  protected static store: Storage =
-    typeof window !== 'undefined' && window.localStorage ? window.localStorage : new MemStore();
+  protected static store: Storage = Env.window?.localStorage || new MemStore();
 
   static get length(): number {
     return this.store.length;
