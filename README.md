@@ -57,6 +57,10 @@ export default config;
 
 # Changelog
 
+## 3.1.0
+
+- Changed my mind about `Env.var`, switched to `Env.get` (might be defined) and `Env.need` (throws when undefined)
+
 ## 3.0.1
 
 - `Env.var` can be called with a second argument for `required`, to throw when not found.

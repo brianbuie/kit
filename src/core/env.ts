@@ -6,23 +6,28 @@ export class Env {
   }
 
   /**
-   * get a variable from process.env (if it exists)
+   * get a variable from process.env, if it exists
    * @param key
    * The key to retrieve
-   * @param required
-   * If true, throws an error when not found
    */
-  static var(key: string, required: true): string;
-  static var(key: string, required?: boolean): string | undefined;
-  static var(key: string, required = false): string | undefined {
-    const value = (this.processEnv || {})[key];
-    if (required && !value) throw new Error(`key ${key} not found in environment`);
+  static get(key: keyof NodeJS.ProcessEnv) {
+    return (this.processEnv || {})[key];
+  }
+
+  /**
+   * get a variable from process.env, throws if undefined
+   * @param key
+   * The key to retrieve
+   */
+  static need(key: keyof NodeJS.ProcessEnv) {
+    const value = this.get(key);
+    if (value === undefined) throw new Error(`key "${key}" not found in environment`);
     return value;
   }
 
-  // TODO: vite
+  // TODO: vite & browser alternatives
   static get isProd(): boolean {
-    return this.var('NODE_ENV') === 'production';
+    return this.get('NODE_ENV') === 'production';
   }
 
   /**
@@ -30,7 +35,7 @@ export class Env {
    * @see https://cloud.google.com/run/docs/container-contract#env-vars
    */
   static get isGcloud(): boolean {
-    return this.processEnv?.K_SERVICE !== undefined || this.processEnv?.CLOUD_RUN_JOB !== undefined;
+    return this.get('K_SERVICE') !== undefined || this.get('CLOUD_RUN_JOB') !== undefined;
   }
 
   static get isBrowser(): boolean {

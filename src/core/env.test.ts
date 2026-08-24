@@ -18,18 +18,18 @@ describe('Env', () => {
 
   it('reads environment variables dynamically', () => {
     process.env.TEST_ENV_VALUE = 'value';
-    assert.equal(Env.var('TEST_ENV_VALUE'), 'value');
+    assert.equal(Env.get('TEST_ENV_VALUE'), 'value');
     delete process.env.TEST_ENV_VALUE;
-    assert.equal(Env.var('TEST_ENV_VALUE'), undefined);
+    assert.equal(Env.get('TEST_ENV_VALUE'), undefined);
   });
 
   it('requires environment variables when requested', () => {
     process.env.TEST_REQUIRED_ENV_VALUE = 'value';
-    const value: string = Env.var('TEST_REQUIRED_ENV_VALUE', true);
+    const value: string = Env.need('TEST_REQUIRED_ENV_VALUE');
     assert.equal(value, 'value');
 
     delete process.env.TEST_REQUIRED_ENV_VALUE;
-    assert.throws(() => Env.var('TEST_REQUIRED_ENV_VALUE', true));
+    assert.throws(() => Env.need('TEST_REQUIRED_ENV_VALUE'));
   });
 
   it('detects production mode dynamically', () => {

@@ -55,7 +55,7 @@ export class Log {
   static isBrowser = Env.isBrowser;
   static silent = false;
   static minLevel =
-    Env.var('LOG_LEVEL') !== undefined ? LogLevels[Env.var('LOG_LEVEL') as LogLevel] : Env.isProd ? 2 : 1;
+    Env.get('LOG_LEVEL') !== undefined ? (LogLevels[Env.get('LOG_LEVEL') as LogLevel] ?? 2) : Env.isProd ? 2 : 1;
   static formatters: LogFormatters = {
     prettyMessage: ({ level, message }: LogEntry) => `${Format.date('h:m:s')} [${level}] ${message || ''}`,
     prettyDetails: ({ details }: LogEntry) => JSON.stringify(details, null, 2),
