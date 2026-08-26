@@ -26,7 +26,8 @@
     "mime-types": "^3.0.2",
     "probe-image-size": "^7.3.0",
     "sanitize-filename": "^1.6.3",
-    "string-argv": "^0.3.2"
+    "string-argv": "^0.3.2",
+    "trash": "^10.1.1"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",

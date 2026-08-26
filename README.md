@@ -57,6 +57,11 @@ export default config;
 
 # Changelog
 
+## 3.1.1
+
+- `File.trash()` to move the file to system's trash, instead of deleting.
+- new `File.moveTo` and `File.copyTo` methods
+
 ## 3.1.0
 
 - Changed my mind about `Env.var`, switched to `Env.get` (might be defined) and `Env.need` (throws when undefined)
