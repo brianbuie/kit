@@ -1,6 +1,6 @@
 import { describe, it, assert } from 'vitest';
 import { temp } from './dir.ts';
-import { File } from './file.ts';
+import { File, FileJson } from './file.ts';
 
 const testDir = temp.tempDir('file-test');
 testDir.clear();
@@ -46,6 +46,84 @@ describe('FileType', () => {
     assert.equal(test.readText(), 'test');
     test.delete();
     assert.equal(test.exists, false);
+  });
+
+  it('Deletes files that do not exist without throwing', () => {
+    const test = testDir.file('does-not-exist.txt');
+    assert.equal(test.exists, false);
+    assert.doesNotThrow(() => test.delete());
+  });
+
+  it('Moves files to trash', async () => {
+    const test = testDir.file('trash-test.txt');
+    test.writeText('test');
+    await test.trash();
+    assert.equal(test.exists, false);
+  });
+
+  it('Does nothing when trashing a file that does not exist', async () => {
+    const test = testDir.file('trash-missing.txt');
+    assert.equal(test.exists, false);
+    await test.trash();
+  });
+
+  it('Copies files to another directory', () => {
+    const source = testDir.file('copy-source.txt');
+    source.writeText('test');
+    const destDir = testDir.tempDir('copy-dest');
+    const copy = source.copyTo(destDir.path);
+    assert.equal(source.exists, true);
+    assert.equal(copy.exists, true);
+    assert.equal(copy.readText(), 'test');
+    assert.equal(copy.dir, destDir.path);
+  });
+
+  it('Returns a new File instance without copying when the source does not exist', () => {
+    const source = testDir.file('copy-missing.txt');
+    const destDir = testDir.tempDir('copy-dest-missing');
+    const copy = source.copyTo(destDir.path);
+    assert.equal(copy.exists, false);
+  });
+
+  it('Accepts a Dir instance as the destination for copyTo and moveTo', () => {
+    const copySource = testDir.file('copy-source-dir.txt');
+    copySource.writeText('test');
+    const copyDestDir = testDir.tempDir('copy-dest-dir');
+    const copy = copySource.copyTo(copyDestDir);
+    assert.equal(copy.exists, true);
+    assert.equal(copy.dir, copyDestDir.path);
+
+    const moveSource = testDir.file('move-source-dir.txt');
+    moveSource.writeText('test');
+    const moveDestDir = testDir.tempDir('move-dest-dir');
+    const moved = moveSource.moveTo(moveDestDir);
+    assert.equal(moveSource.exists, false);
+    assert.equal(moved.exists, true);
+    assert.equal(moved.dir, moveDestDir.path);
+  });
+
+  it('Moves files to another directory', () => {
+    const source = testDir.file('move-source.txt');
+    source.writeText('test');
+    const destDir = testDir.tempDir('move-dest');
+    const moved = source.moveTo(destDir.path);
+    assert.equal(source.exists, false);
+    assert.equal(moved.exists, true);
+    assert.equal(moved.readText(), 'test');
+    assert.equal(moved.dir, destDir.path);
+  });
+
+  it('Preserves the subclass type when copying and moving', () => {
+    const source = testDir.file('preserve-type').json({ key: 'val' });
+    const copyDestDir = testDir.tempDir('preserve-copy-dest');
+    const copy = source.copyTo(copyDestDir.path);
+    assert.instanceOf(copy, FileJson);
+    assert.deepEqual(copy.read(), { key: 'val' });
+
+    const moveDestDir = testDir.tempDir('preserve-move-dest');
+    const moved = source.moveTo(moveDestDir.path);
+    assert.instanceOf(moved, FileJson);
+    assert.deepEqual(moved.read(), { key: 'val' });
   });
 });
 

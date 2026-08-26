@@ -4,6 +4,7 @@ import { Readable, Writable } from 'node:stream';
 import { finished } from 'node:stream/promises';
 import trash from 'trash';
 import mime from 'mime-types';
+import type { Dir } from './dir.ts';
 
 /**
  * Shared filesystem operations for the public File facade and format files.
@@ -96,28 +97,24 @@ export class FileBase {
     fs.appendFileSync(this.path, contents + '\n');
   };
 
-  writeStream = async (contents: ReadableStream): Promise<void> => {
-    return finished(Readable.from(contents).pipe(this.writable));
-  };
+  writeStream = async (contents: ReadableStream): Promise<void> =>
+    finished(Readable.from(contents).pipe(this.writable));
 
-  delete = (): void => {
-    if (this.exists) fs.rmSync(this.path, { force: true });
-  };
+  delete = (): void => fs.rmSync(this.path, { force: true });
 
   /**
    * Move the file to the system's trash, in case you mess up and need to restore it.
    */
-  trash = async (): Promise<void> => {
-    if (this.exists) return trash(this.path);
-  };
+  trash = async (): Promise<void> => trash(this.path);
 
   /**
    * Copy the file to another directory. If the file doesn't exist, nothing is copied, but the new File instance is still returned
    * @returns
-   * A new File instance at the new location
+   * A new File instance (eg. FileBase, FileJson) at the new location.
    */
-  copyTo = (dirPath: string): FileBase => {
-    const newFile = new (this.constructor as typeof FileBase)(path.join(dirPath, this.base));
+  copyTo = (dir: string | Dir): this => {
+    const dirPath = typeof dir === 'string' ? dir : dir.path;
+    const newFile = new (this.constructor as new (filepath: string) => this)(path.join(dirPath, this.base));
     if (this.exists) {
       fs.mkdirSync(dirPath, { recursive: true });
       fs.copyFileSync(this.path, newFile.path);
@@ -128,10 +125,10 @@ export class FileBase {
   /**
    * Copy the file to another directory. (copies the file and deletes the original)
    * @returns
-   * A new File instance at the new location
+   * A new File instance (eg. FileBase, FileJson) at the new location.
    */
-  moveTo = (dirPath: string): FileBase => {
-    const newFile = this.copyTo(dirPath);
+  moveTo = (dir: string | Dir): this => {
+    const newFile = this.copyTo(dir);
     this.delete();
     return newFile;
   };
