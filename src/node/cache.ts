@@ -19,24 +19,19 @@ export class Cache<T> extends CacheCore<T> {
   file?: FileJson<CacheEntry<T>>;
 
   constructor({ dir, key, ttl, data }: CacheOptions<T>) {
-    super({ key, ttl });
+    let file: FileJson<CacheEntry<T>> | undefined;
     if (dir) {
       const cacheDir = dir instanceof Dir ? dir : new Dir(dir, { temp: true });
       if (!cacheDir.isTemp) throw new Error('Cache directory must be temporary');
-      this.file = cacheDir.file(key).json();
+      file = cacheDir.file(key).json();
     }
-    if (data !== undefined) this.write(data);
-  }
-
-  protected get entry(): CacheEntry<T> | undefined {
-    return this.file ? this.file.read() : super.entry;
-  }
-
-  protected set entry(newEntry: CacheEntry<T>) {
-    if (this.file) {
-      this.file.write(newEntry);
-    } else {
-      super.entry = newEntry;
-    }
+    super(
+      { key, ttl, data },
+      file && {
+        read: () => file!.read(),
+        write: entry => file!.write(entry),
+      },
+    );
+    this.file = file;
   }
 }

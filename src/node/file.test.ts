@@ -1,6 +1,6 @@
 import { describe, it, assert } from 'vitest';
 import { temp } from './dir.ts';
-import { File, FileJson } from './file.ts';
+import { File } from './file.ts';
 
 const testDir = temp.tempDir('file-test');
 testDir.clear();
@@ -137,12 +137,12 @@ describe('FileType', () => {
     const source = testDir.file('preserve-type').json({ key: 'val' });
     const copyDestDir = testDir.tempDir('preserve-copy-dest');
     const copy = source.copyTo(copyDestDir.path);
-    assert.instanceOf(copy, FileJson);
+    assert.instanceOf(copy, File.json);
     assert.deepEqual(copy.read(), { key: 'val' });
 
     const moveDestDir = testDir.tempDir('preserve-move-dest');
     const moved = source.moveTo(moveDestDir.path);
-    assert.instanceOf(moved, FileJson);
+    assert.instanceOf(moved, File.json);
     assert.deepEqual(moved.read(), { key: 'val' });
   });
 });

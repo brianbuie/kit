@@ -1,4 +1,4 @@
-export { Cache, type CacheOptions } from './cache.ts';
+export { Cache, type CacheOptions, type CacheStorage } from './cache.ts';
 export { Env } from './env.ts';
 export { Fetcher } from './fetcher.ts';
 export type { Route, Query, FetchHeaders, BuildHeaders, FetchOptions, FetchTransport, FetchDelay } from './fetcher.ts';

@@ -57,6 +57,14 @@ export default config;
 
 # Changelog
 
+## 3.3.0
+
+- `Fetcher`
+  - new `buildHeaders` option for providing a function that's called on every request. Hopefully prevents needing to "break glass" and extend the base `Fetcher` class.
+  - 2 arguments can be provided when creating an instance, first arg can be a string for the URL base.
+- `File` - Individual file types (eg. FileJson, FileCsv) are not exported anymore, they're only accessible via `fileInstance.json()` or `new File.json()`.
+- `Cache` - Added argument for Storage, simplifying inheritance.
+
 ## 3.2.0
 
 - `TypeWriter` just takes an output path as the first parameter, instead of trying to name the file based on the module name input.

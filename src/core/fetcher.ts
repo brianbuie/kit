@@ -1,6 +1,7 @@
 import { merge, pick } from 'lodash-es';
 import extractDomain from 'extract-domain';
 import { Log } from './log.ts';
+import { timeout } from './timeout.ts';
 
 export type Route = string | URL;
 
@@ -60,7 +61,7 @@ export class Fetcher {
       retries: 0,
       retryDelay: 3000,
       transport: fetch,
-      delay: ms => new Promise(resolve => setTimeout(resolve, ms)),
+      delay: timeout,
       ...(typeof baseOrOpts === 'string' ? { base: baseOrOpts } : baseOrOpts),
       ...opts,
     };

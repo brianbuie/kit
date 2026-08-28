@@ -81,8 +81,5 @@ export class File extends FileBase {
   }
 }
 
-export { FileCsv, type FileCsvOptions } from './file-csv.ts';
-export { FileImage } from './file-image.ts';
-export { FileJson } from './file-json.ts';
-export { FileNdjson } from './file-ndjson.ts';
-export { FileVideo, type VideoDimensions } from './file-video.ts';
+export { type FileCsvOptions } from './file-csv.ts';
+export { type VideoDimensions } from './file-video.ts';
