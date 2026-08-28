@@ -1,28 +1,29 @@
-import * as fs from 'node:fs';
 import { merge } from 'lodash-es';
 import * as qt from 'quicktype-core';
+import { File, cwd } from '../node/_index.ts';
 
 /**
  * IMPORTANT: [quicktype-core](https://github.com/glideapps/quicktype) needs to be installed in the project.
  * @example
  * import { TypeWriter } from '@brianbuie/kit/TypeWriter'
- * const group = new TypeWriter('Group');
+ * const group = new TypeWriter('src/group.types.ts');
  * await types.addMember('Thing', [{ a: 1 }, { a: 2, b: 1 }]);
  * await types.toFile();
- * // type def for `Thing` saved in `types/Group.types.ts`
+ * // type def for `Thing` saved in `./src/group.types.ts`
  */
 export class TypeWriter {
-  moduleName: string;
+  file;
+  settings;
   input = qt.jsonInputForTargetLanguage('typescript');
-  outDir: string;
-  outFile: string;
-  qtSettings: Partial<qt.Options>;
 
-  constructor(moduleName: string, settings: { outDir?: string; outFile?: string } & Partial<qt.Options> = {}) {
-    this.moduleName = moduleName;
-    const { outDir, outFile, ...qtSettings } = settings;
-    this.outDir = outDir || './types';
-    this.outFile = outFile || `${this.moduleName}.types.ts`;
+  constructor(filepath: string, settings: Partial<qt.Options> = {}) {
+    this.file = new File(filepath);
+    if (this.file.ext !== '.ts') {
+      throw new Error(`TypeWriter: output path is not a .ts file. (${this.file.path})`);
+    }
+    if (!this.file.path.includes(cwd.path)) {
+      throw new Error(`TypeWriter: output path is outside of the current working directory. (${this.file.path})`);
+    }
     const defaultSettings = {
       lang: 'typescript',
       rendererOptions: {
@@ -32,7 +33,7 @@ export class TypeWriter {
       inferEnums: false,
       inferDateTimes: false,
     };
-    this.qtSettings = merge(defaultSettings, qtSettings);
+    this.settings = merge(defaultSettings, settings);
   }
 
   addMember = async (name: string, _samples: any[]): Promise<void> => {
@@ -45,14 +46,13 @@ export class TypeWriter {
     inputData.addInput(this.input);
     const result = await qt.quicktype({
       inputData,
-      ...this.qtSettings,
+      ...this.settings,
     });
     return result.lines.join('\n');
   };
 
   toFile = async (): Promise<void> => {
     const result = await this.toString();
-    fs.mkdirSync(this.outDir, { recursive: true });
-    fs.writeFileSync(`${this.outDir}/${this.outFile}`, result);
+    this.file.writeText(result);
   };
 }

@@ -13,3 +13,4 @@ export {
   type FileCsvOptions,
   type VideoDimensions,
 } from './file.ts';
+export { parsePath, type ParsedPath } from './parse-path.ts';

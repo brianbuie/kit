@@ -5,6 +5,8 @@ import { finished } from 'node:stream/promises';
 import trash from 'trash';
 import mime from 'mime-types';
 import type { Dir } from './dir.ts';
+import { Env } from '../core/_index.ts';
+import { parsePath, type ParsedPath } from './parse-path.ts';
 
 /**
  * Shared filesystem operations for the public File facade and format files.
@@ -14,10 +16,6 @@ export class FileBase {
    * The absolute path of the file
    */
   path: string;
-  /**
-   * The root of the path such as '/' or 'c:'
-   */
-  root: string;
   /**
    * The full directory path such as '/home/user/dir' or 'c:\path\dir'
    */
@@ -33,29 +31,30 @@ export class FileBase {
   /**
    * The file extension (if any) such as '.html'
    */
-  ext: string;
+  ext?: string;
   /**
    * The full content type, based on the extension, eg. 'application/json' or 'text/html'
    */
   type?: string;
 
   constructor(filepath: string) {
-    this.path = this.resolve(filepath);
-    const { root, dir, base, ext, name } = path.parse(this.path);
-    this.root = root;
+    const { path, dir, base, ext, name } = this.parsePath(filepath);
+    if (!base || !name) {
+      throw new Error(`path must be a file (${filepath})`);
+    }
+    this.path = path;
     this.dir = dir;
     this.base = base;
     this.name = name;
     this.ext = ext;
-    this.type = mime.lookup(ext) || undefined;
+    this.type = mime.lookup(ext || '') || undefined;
   }
 
-  private resolve = (filepath: string): string => {
+  private parsePath = (filepath: string): ParsedPath => {
     if (filepath.startsWith('~')) {
-      if (!process.env.HOME) throw new Error("Can't resolve process.env.HOME for '~' in path.");
-      return path.join(process.env.HOME, filepath.slice(1));
+      return parsePath(Env.need('HOME') + '/' + filepath.slice(1));
     }
-    return path.resolve(filepath);
+    return parsePath(filepath);
   };
 
   prepareWrite = () => {
@@ -108,28 +107,46 @@ export class FileBase {
   trash = async (): Promise<void> => trash(this.path);
 
   /**
-   * Copy the file to another directory. If the file doesn't exist, nothing is copied, but the new File instance is still returned
+   * Create a new File instance at a new location.
+   */
+  protected cloneTo = (dirOrFile: string | Dir): this => {
+    const inputPath = typeof dirOrFile === 'string' ? dirOrFile : dirOrFile.path;
+    const { dir, base } = parsePath(inputPath);
+    const newPath = [dir, base || this.base].join('/');
+    return new (this.constructor as new (filepath: string) => this)(newPath);
+  };
+
+  /**
+   * Copy the file to a new location. If the source file doesn't exist, nothing is copied, but the new File instance is still returned.
+   * If a directory path is provided, the file will be copied to that directory, keeping its name.
+   * If a filepath is provided, the fill will be copied to the new filepath.
+   * This will overwrite the new filepath if it already exists.
    * @returns
    * A new File instance (eg. FileBase, FileJson) at the new location.
    */
   copyTo = (dir: string | Dir): this => {
-    const dirPath = typeof dir === 'string' ? dir : dir.path;
-    const newFile = new (this.constructor as new (filepath: string) => this)(path.join(dirPath, this.base));
+    const newFile = this.cloneTo(dir);
     if (this.exists) {
-      fs.mkdirSync(dirPath, { recursive: true });
+      newFile.prepareWrite();
       fs.copyFileSync(this.path, newFile.path);
     }
     return newFile;
   };
 
   /**
-   * Copy the file to another directory. (copies the file and deletes the original)
+   * Move the file to a new location. If the source file doesn't exist, nothing is created, but the new File instance is still returned.
+   * If a directory path is provided, the file will be moved to that directory, keeping its name.
+   * If a filepath is provided, the fill will be moved to the new filepath.
+   * This will overwrite the new filepath if it already exists.
    * @returns
    * A new File instance (eg. FileBase, FileJson) at the new location.
    */
   moveTo = (dir: string | Dir): this => {
-    const newFile = this.copyTo(dir);
-    this.delete();
+    const newFile = this.cloneTo(dir);
+    if (this.exists) {
+      newFile.prepareWrite();
+      fs.renameSync(this.path, newFile.path);
+    }
     return newFile;
   };
 }
