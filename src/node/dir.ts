@@ -1,8 +1,8 @@
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import sanitizeFilename from 'sanitize-filename';
 import { File } from './file.ts';
-import { Format } from '../core/format.ts';
+import { parsePath } from './parse-path.ts';
+import { Format } from '../core/_index.ts';
 
 export type DirOptions = {
   temp?: boolean;
@@ -32,14 +32,7 @@ export class Dir {
    */
   get pathUnsafe(): string {
     if (this.resolved) return this.resolved;
-    if (this.inputPath[0] === '~') {
-      if (process.env.HOME) {
-        return path.join(process.env.HOME, this.inputPath.slice(1));
-      } else {
-        console.warn('process.env.HOME does not exist! "~" will not resolve to home directory');
-      }
-    }
-    return path.resolve(this.inputPath);
+    return parsePath(this.inputPath).path;
   }
 
   /**
@@ -62,7 +55,10 @@ export class Dir {
    * console.log(example.name); // "folder"
    */
   get name(): string {
-    return this.pathUnsafe.split(path.sep).at(-1)!;
+    return this.pathUnsafe
+      .split('/')
+      .filter(s => s.length > 0)
+      .at(-1)!;
   }
 
   /**
@@ -78,7 +74,8 @@ export class Dir {
    * // child.path = '/path/to/cwd/example/path/to/dir'
    */
   dir = (subPath = Format.date('ymd'), options: DirOptions = { temp: this.isTemp }): Dir => {
-    return new (this.constructor as typeof Dir)(path.join(this.path, subPath), options) as this;
+    const newPath = subPath.startsWith('/') ? subPath.slice(1) : subPath;
+    return new (this.constructor as typeof Dir)(parsePath(newPath, this.path).path, options) as this;
   };
 
   /**
@@ -102,7 +99,7 @@ export class Dir {
    * // '/path/to/example/file.json'
    */
   filepath = (base: string): string => {
-    return path.resolve(this.path, this.sanitize(base));
+    return parsePath(this.sanitize(base), this.path).path;
   };
 
   /**
@@ -118,7 +115,7 @@ export class Dir {
   get contents(): (Dir | File)[] {
     return fs
       .readdirSync(this.path)
-      .map(name => (fs.statSync(path.join(this.path, name)).isDirectory() ? this.dir(name) : this.file(name)));
+      .map(name => (fs.statSync(parsePath(name, this.path).path).isDirectory() ? this.dir(name) : this.file(name)));
   }
 
   /**

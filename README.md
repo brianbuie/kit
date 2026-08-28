@@ -57,6 +57,12 @@ export default config;
 
 # Changelog
 
+## 3.2.0
+
+- `TypeWriter` just takes an output path as the first parameter, instead of trying to name the file based on the module name input.
+- `File.copyTo` and `File.moveTo` look for a second parameter to use as the new filename. Current filename is used by default
+- new `parsePath` function that's a little better than `path.parse()`, but still sucks, just in a different way.
+
 ## 3.1.1
 
 - `File.trash()` to move the file to system's trash, instead of deleting.

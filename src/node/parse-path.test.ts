@@ -63,6 +63,16 @@ describe('parsePath', () => {
     });
   });
 
+  it('Resolves home directory input', () => {
+    assert.deepEqual(parsePath('~/path/to/file.txt'), {
+      path: `${process.env.HOME}/path/to/file.txt`,
+      dir: `${process.env.HOME}/path/to`,
+      base: 'file.txt',
+      name: 'file',
+      ext: '.txt',
+    });
+  });
+
   it('Parses a file with multiple dots using the last extension', () => {
     assert.deepEqual(parsePath('/path/to/archive.tar.gz'), {
       path: '/path/to/archive.tar.gz',

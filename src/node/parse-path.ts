@@ -1,3 +1,5 @@
+import { Env } from '../core/_index.ts';
+
 export type ParsedPath = {
   path: string;
   dir: string;
@@ -30,6 +32,9 @@ export type ParsedPath = {
  * }
  */
 export function parsePath(input: string, from = process.cwd()): ParsedPath {
+  if (input.startsWith('~')) {
+    input = input.replace('~', Env.need('HOME'));
+  }
   const resolved = input.startsWith('/') ? input : [from, input.replace(/^.\//, '')].join('/');
   const path = resolved === '/' ? resolved : resolved.replace(/\/+$/, '');
   const segments = path.split('/').filter(s => s.length > 0);

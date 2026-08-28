@@ -78,6 +78,16 @@ describe('FileType', () => {
     assert.equal(copy.dir, destDir.path);
   });
 
+  it('Copies files to another filepath', () => {
+    const source = testDir.file('copy-source-path.txt');
+    source.writeText('test');
+    const copy = source.copyTo(`${testDir.path}/copy-dest-path`, 'renamed.txt');
+    assert.equal(source.exists, true);
+    assert.equal(copy.exists, true);
+    assert.equal(copy.readText(), 'test');
+    assert.equal(copy.base, 'renamed.txt');
+  });
+
   it('Returns a new File instance without copying when the source does not exist', () => {
     const source = testDir.file('copy-missing.txt');
     const destDir = testDir.tempDir('copy-dest-missing');
@@ -111,6 +121,16 @@ describe('FileType', () => {
     assert.equal(moved.exists, true);
     assert.equal(moved.readText(), 'test');
     assert.equal(moved.dir, destDir.path);
+  });
+
+  it('Moves files to another filepath', () => {
+    const source = testDir.file('move-source-path.txt');
+    source.writeText('test');
+    const moved = source.moveTo(`${testDir.path}/move-dest-path`, 'renamed.txt');
+    assert.equal(source.exists, false);
+    assert.equal(moved.exists, true);
+    assert.equal(moved.readText(), 'test');
+    assert.equal(moved.base, 'renamed.txt');
   });
 
   it('Preserves the subclass type when copying and moving', () => {
