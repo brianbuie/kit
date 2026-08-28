@@ -72,6 +72,59 @@ describe('Fetcher', () => {
     assert(url.href.includes('multiple=2'));
   });
 
+  it('Accepts a base URL as the first constructor argument', () => {
+    const api = new Fetcher('https://example.org');
+    const [url] = api.buildUrl('/test');
+    assert(url.href === 'https://example.org/test');
+  });
+
+  it('Accepts a base URL and options in the constructor', () => {
+    const api = new Fetcher('https://example.org', { retries: 2 });
+    assert(api.defaultOptions.base === 'https://example.org');
+    assert(api.defaultOptions.retries === 2);
+  });
+
+  it('Builds headers by merging defaultOptions and options', async () => {
+    const api = new Fetcher({ base: 'https://example.org', headers: { 'x-default': '1' } });
+    const headers = await api.buildHeaders('/', { headers: { 'x-extra': '2' } });
+    assert(headers['x-default'] === '1');
+    assert(headers['x-extra'] === '2');
+  });
+
+  it('Allows overriding header building with a custom buildHeaders function', async () => {
+    const api = new Fetcher({
+      base: 'https://example.org',
+      buildHeaders: (route, opts = {}) => ({ authorization: `Bearer token-for-${route}`, base: opts.base }),
+    });
+    const headers = await api.buildHeaders('/secure');
+    assert(headers.authorization === 'Bearer token-for-/secure');
+    assert(headers.base === 'https://example.org');
+  });
+
+  it('Supports an async custom buildHeaders function', async () => {
+    const api = new Fetcher({
+      base: 'https://example.org',
+      buildHeaders: async () => {
+        await new Promise(resolve => setTimeout(resolve, 1));
+        return { 'x-custom': 'yes' };
+      },
+    });
+    const headers = await api.buildHeaders('/');
+    assert(headers['x-custom'] === 'yes');
+  });
+
+  it('Uses a custom buildHeaders function when performing a fetch', async () => {
+    const api = new Fetcher({
+      base: 'https://example.org',
+      buildHeaders: () => ({ 'x-custom': 'yes' }),
+      transport: async request => {
+        assert(request.headers.get('x-custom') === 'yes');
+        return response(200);
+      },
+    });
+    await api.fetch('/test');
+  });
+
   it('Throws on bad request', async () => {
     const requests: Request[] = [];
     const api = new Fetcher({

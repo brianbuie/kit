@@ -1,13 +1,17 @@
-import { merge } from 'lodash-es';
+import { merge, pick } from 'lodash-es';
 import extractDomain from 'extract-domain';
+import { Log } from './log.ts';
 
 export type Route = string | URL;
 
 type QueryVal = string | number | boolean | null | undefined;
 export type Query = Record<string, QueryVal | QueryVal[]>;
 
+export type FetchHeaders = Record<string, string | undefined>;
+export type BuildHeaders = (r: Route, o?: FetchOptions) => FetchHeaders | Promise<FetchHeaders>;
+
 export type FetchTransport = (request: Request) => Promise<Response>;
-export type FetchDelay = (milliseconds: number) => Promise<void>;
+export type FetchDelay = (ms: number) => Promise<void>;
 
 export type FetchOptions = RequestInit & {
   base?: string;
@@ -19,7 +23,28 @@ export type FetchOptions = RequestInit & {
   retryDelay?: number;
   transport?: FetchTransport;
   delay?: FetchDelay;
+  buildHeaders?: BuildHeaders;
 };
+
+function pickRequestInit(opts: FetchOptions) {
+  return pick(opts, [
+    'body',
+    'cache',
+    'credentials',
+    'dispatcher',
+    'duplex',
+    'headers',
+    'integrity',
+    'keepalive',
+    'method',
+    'mode',
+    'redirect',
+    'referrer',
+    'referrerPolicy',
+    'signal',
+    'window',
+  ]);
+}
 
 /**
  * Fetcher provides a quick way to set up a basic API connection
@@ -29,24 +54,25 @@ export type FetchOptions = RequestInit & {
 export class Fetcher {
   defaultOptions: FetchOptions;
 
-  constructor(opts: FetchOptions = {}) {
+  constructor(baseOrOpts: string | FetchOptions = {}, opts: FetchOptions = {}) {
     this.defaultOptions = {
       timeout: 60000,
       retries: 0,
       retryDelay: 3000,
       transport: fetch,
-      delay: milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds)),
+      delay: ms => new Promise(resolve => setTimeout(resolve, ms)),
+      ...(typeof baseOrOpts === 'string' ? { base: baseOrOpts } : baseOrOpts),
       ...opts,
     };
   }
 
   /**
    * Build URL with URLSearchParams if query is provided.
-   * Also returns domain, to help with cookies.
    * Query params are merged in this order, last instance of key wins:
    * 1. defaultOptions.query
    * 2. route URLSearchParams
    * 3. options.query
+   * @returns [url, domain]
    */
   buildUrl = (route: Route, opts: FetchOptions = {}): [URL, string] => {
     const routeUrl = route instanceof URL ? route : new URL(route, opts.base || this.defaultOptions.base);
@@ -70,32 +96,33 @@ export class Fetcher {
   };
 
   /**
-   * Merges options to get headers. Useful when extending the Fetcher class to add custom auth.
+   * Merges options to build the headers for the request.
+   * A custom `buildHeaders` function can be provided in FetchOptions to override this
    */
-  buildHeaders = (route: Route, opts: FetchOptions = {}): HeadersInit & Record<string, string> => {
-    const { headers } = merge({}, this.defaultOptions, opts);
-    return headers || {};
+  buildHeaders: BuildHeaders = async (route, opts = {}) => {
+    const merged = merge({}, this.defaultOptions, opts);
+    return merged.buildHeaders?.(route, merged) ?? merged.headers!;
   };
 
   /**
    * Builds request, merging defaultOptions and provided options.
    * Includes Abort signal for timeout
    */
-  buildRequest = (route: Route, opts: FetchOptions = {}): [Request, FetchOptions, string] => {
-    const mergedOptions = merge({}, this.defaultOptions, opts);
-    const { query, data, timeout, retries, retryDelay, transport, delay, ...init } = mergedOptions;
-    init.headers = this.buildHeaders(route, mergedOptions);
-    if (data) {
+  buildRequest = async (route: Route, opts: FetchOptions = {}): Promise<[Request, FetchOptions, string]> => {
+    const merged = merge({}, this.defaultOptions, opts);
+    const init = pickRequestInit(merged);
+    init.headers = (await this.buildHeaders(route, merged)) as Record<string, string>;
+    if (merged.data) {
       init.headers['content-type'] = init.headers['content-type'] || 'application/json';
       init.method = init.method || 'POST';
-      init.body = JSON.stringify(data);
+      init.body = JSON.stringify(merged.data);
     }
-    if (timeout) {
-      init.signal = AbortSignal.timeout(timeout);
+    if (merged.timeout) {
+      init.signal = AbortSignal.timeout(merged.timeout);
     }
-    const [url, domain] = this.buildUrl(route, mergedOptions);
+    const [url, domain] = this.buildUrl(route, merged);
     const req = new Request(url, init);
-    return [req, mergedOptions, domain];
+    return [req, merged, domain];
   };
 
   /**
@@ -104,12 +131,12 @@ export class Fetcher {
    * Retries on local or network error, with increasing backoff.
    */
   fetch = async (route: Route, opts: FetchOptions = {}): Promise<[Response, Request]> => {
-    const [_req, options] = this.buildRequest(route, opts);
+    const [_req, options] = await this.buildRequest(route, opts);
     const maxAttempts = (options.retries || 0) + 1;
     let attempt = 0;
     while (attempt < maxAttempts) {
       attempt++;
-      const [req] = this.buildRequest(route, opts);
+      const [req] = await this.buildRequest(route, opts);
       const res = await options.transport!(req)
         .then(r => {
           if (!r.ok) throw new Error(r.statusText);
@@ -118,7 +145,7 @@ export class Fetcher {
         .catch(async error => {
           if (attempt < maxAttempts) {
             const wait = attempt * (options.retryDelay || 0);
-            console.warn(`${req.method} ${req.url} (attempt ${attempt} of ${maxAttempts})`, error);
+            Log.warn(`${req.method} ${req.url} (attempt ${attempt} of ${maxAttempts})`, error);
             await options.delay!(wait);
           } else {
             throw new Error(error);
