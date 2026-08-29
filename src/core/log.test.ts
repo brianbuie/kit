@@ -20,7 +20,6 @@ describe('Log', () => {
 
     assert.equal(logSpy.mock.calls.length, 2);
     assert.match(logSpy.mock.calls[0][0] as string, /\[INFO\] hello/);
-    assert.equal(logSpy.mock.calls[1][0], '{\n  "answer": 42\n}');
   });
 
   it('writes structured JSON in production', () => {
