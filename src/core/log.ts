@@ -130,4 +130,12 @@ export class Log {
    * Events that require action or attention immediately.
    */
   static alert = (...input: LogArgs): void => Log.write('ALERT', input);
+
+  /**
+   * Starts a timer, similar to `console.time`. Returns a function to stop it and log the duration.
+   */
+  static timer = (input: string): (() => void) => {
+    const start = performance.now();
+    return () => Log.info(`${Format.ms(performance.now() - start)} - ${input}`);
+  };
 }

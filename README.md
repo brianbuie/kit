@@ -57,6 +57,10 @@ export default config;
 
 # Changelog
 
+## 3.3.2
+
+- New `Log.timer` method.
+
 ## 3.3.1
 
 - `Log` handles browser vs node.js internally, instead of relying on separate exports

@@ -115,4 +115,15 @@ describe('Log', () => {
     assert.equal(entry.severity, 'WARNING');
     assert.equal(entry.message, 'example');
   });
+
+  it('timer logs the elapsed duration for the given name', () => {
+    Log.isGcloud = true;
+
+    const stop = Log.timer('my-task');
+    stop();
+
+    const entry = JSON.parse(logSpy.mock.calls[0][0] as string);
+    assert.equal(entry.severity, 'INFO');
+    assert.match(entry.message, /^\d+(\.\d+)?ms - my-task$/);
+  });
 });
