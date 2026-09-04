@@ -1,8 +1,12 @@
 export class Env {
-  static get processEnv(): NodeJS.ProcessEnv | undefined {
+  static get process(): NodeJS.Process | undefined {
     if (typeof process !== 'undefined') {
-      return process.env;
+      return process;
     }
+  }
+
+  static get processEnv(): NodeJS.ProcessEnv | undefined {
+    return this.process?.env;
   }
 
   /**
@@ -45,6 +49,12 @@ export class Env {
   static get window(): (Window & typeof globalThis) | undefined {
     if (this.isBrowser) {
       return window;
+    }
+  }
+
+  static throwIfWin32() {
+    if (this.process?.platform === 'win32') {
+      throw new Error('Windows OS is not supported.');
     }
   }
 }

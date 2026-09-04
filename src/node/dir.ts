@@ -1,10 +1,15 @@
 import * as fs from 'node:fs';
+import { merge } from 'lodash-es';
 import sanitizeFilename from 'sanitize-filename';
 import { File } from './file.ts';
 import { parsePath } from './parse-path.ts';
-import { Format } from '../core/_index.ts';
+import { Format, Env } from '../core/_index.ts';
 
-export type DirOptions = {
+type FileOptions = {
+  date?: boolean;
+};
+
+export type DirOptions = FileOptions & {
   temp?: boolean;
 };
 
@@ -20,11 +25,12 @@ export type DirOptions = {
 export class Dir {
   protected inputPath: string;
   protected resolved?: string;
-  isTemp: boolean;
+  options: DirOptions;
 
   constructor(where = Format.date('ymd'), options: DirOptions = {}) {
+    Env.throwIfWin32();
     this.inputPath = where;
-    this.isTemp = Boolean(options.temp);
+    this.options = options;
   }
 
   /**
@@ -73,8 +79,9 @@ export class Dir {
    * const child = folder.dir('path/to/dir');
    * // child.path = '/path/to/cwd/example/path/to/dir'
    */
-  dir = (subPath = Format.date('ymd'), options: DirOptions = { temp: this.isTemp }): Dir => {
+  dir = (subPath = Format.date('ymd'), opts: DirOptions = {}): typeof this => {
     const newPath = subPath.startsWith('/') ? subPath.slice(1) : subPath;
+    const options = merge({}, this.options, opts);
     return new (this.constructor as typeof Dir)(parsePath(newPath, this.path).path, options) as this;
   };
 
@@ -82,8 +89,8 @@ export class Dir {
    * Creates a new temp directory inside current Dir
    * @param subPath joined with parent Dir's path to make new TempDir
    */
-  tempDir = (subPath?: string): Dir => {
-    return this.dir(subPath, { temp: true });
+  tempDir = (subPath?: string, opts: DirOptions = {}): typeof this => {
+    return this.dir(subPath, merge({ temp: true }, opts));
   };
 
   sanitize = (filename: string): string => {
@@ -92,21 +99,28 @@ export class Dir {
   };
 
   /**
-   * @param base - The file base (name and extension)
+   * Provides the full filepath for a file in this directory (it doesn't need to exist on the filesystem)
+   * @param base - The file base (name and extension). Defaults to 'ymd-hms' date if not provided.
+   * @param options - optional `{ date: true }` to prefix the filename with 'ymd-hms' date (can also be set in the Dir's options)
    * @example
    * const folder = new Dir('example');
    * const filepath = folder.resolve('file.json');
    * // '/path/to/example/file.json'
    */
-  filepath = (base: string): string => {
-    return parsePath(this.sanitize(base), this.path).path;
+  filepath = (base?: string, opts: FileOptions = {}): string => {
+    if (!base) return parsePath(Format.date('ymd-hms'), this.path).path;
+    const options = merge({}, this.options, opts);
+    const name = options.date ? `${Format.date('ymd-hms')}-${base}` : base;
+    return parsePath(this.sanitize(name), this.path).path;
   };
 
   /**
-   * Create a new file in this directory. Filename defaults to `YYYYMMDD-HHMMSS` if not provided
+   * Create a new File instance in this directory.
+   * @param base - The file base (name and extension). Defaults to 'ymd-hms' date if not provided.
+   * @param options - optional `{ date: true }` to prefix the filename with 'ymd-hms' date (can also be set in the Dir's options)
    */
-  file = (base = Format.date('ymd-hms')): File => {
-    return new File(this.filepath(base));
+  file = (base?: string, opts: FileOptions = {}): File => {
+    return new File(this.filepath(base, opts));
   };
 
   /**
@@ -190,7 +204,7 @@ export class Dir {
    * Deletes the contents of the directory. Only allowed if created with `temp` option set to `true` (or created with `dir.tempDir` method).
    */
   clear = (): void => {
-    if (!this.isTemp) throw new Error('Dir is not temporary');
+    if (!this.options.temp) throw new Error('Dir is not temporary');
     fs.rmSync(this.path, { recursive: true, force: true });
     fs.mkdirSync(this.path, { recursive: true });
   };

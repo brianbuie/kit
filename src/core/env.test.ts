@@ -59,4 +59,17 @@ describe('Env', () => {
     assert.equal(Env.isBrowser, false);
     assert.equal(Env.window, undefined);
   });
+
+  it('exposes the process object', () => {
+    assert.equal(Env.process, process);
+  });
+
+  it('throwIfWin32 throws only on win32 platform', () => {
+    const originalPlatform = process.platform;
+    Object.defineProperty(process, 'platform', { value: 'win32' });
+    assert.throws(() => Env.throwIfWin32(), /Windows OS is not supported/);
+    Object.defineProperty(process, 'platform', { value: 'darwin' });
+    assert.doesNotThrow(() => Env.throwIfWin32());
+    Object.defineProperty(process, 'platform', { value: originalPlatform });
+  });
 });

@@ -22,7 +22,7 @@ export class Cache<T> extends CacheCore<T> {
     let file: FileJson<CacheEntry<T>> | undefined;
     if (dir) {
       const cacheDir = dir instanceof Dir ? dir : new Dir(dir, { temp: true });
-      if (!cacheDir.isTemp) throw new Error('Cache directory must be temporary');
+      if (!cacheDir.options.temp) throw new Error('Cache directory must be temporary');
       file = cacheDir.file(key).json();
     }
     super(

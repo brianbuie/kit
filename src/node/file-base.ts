@@ -5,6 +5,7 @@ import { finished } from 'node:stream/promises';
 import trash from 'trash';
 import mime from 'mime-types';
 import type { Dir } from './dir.ts';
+import { Env } from '../core/_index.ts';
 import { parsePath } from './parse-path.ts';
 
 /**
@@ -37,6 +38,7 @@ export class FileBase {
   type?: string;
 
   constructor(filepath: string) {
+    Env.throwIfWin32();
     this.path = parsePath(filepath).path;
     // Need to assume last segment in filepath is the filename, even if it doesn't have an extension
     const { base, name, dir, ext } = path.parse(this.path);

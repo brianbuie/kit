@@ -57,6 +57,11 @@ export default config;
 
 # Changelog
 
+## 3.5.0
+
+- Added `{ date: true }` option on `Dir` to prefix all files with the date
+- `Env.throwIfWin32`
+
 ## 3.4.0
 
 - Remove confusing `Fetcher.buildHeaders` override function. Just extend the class for method overrides.

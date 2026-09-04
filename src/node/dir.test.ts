@@ -1,5 +1,6 @@
 import { describe, it, assert } from 'vitest';
 import { temp, Dir } from './dir.ts';
+import { Env } from '../core/_index.ts';
 
 describe('Dir', () => {
   const testDir = temp.dir('dir-test');
@@ -37,7 +38,7 @@ describe('Dir', () => {
 
   it('.tempDir returns temporary directory', () => {
     const sub = testDir.tempDir('example');
-    assert(sub.isTemp);
+    assert(sub.options.temp);
   });
 
   it('.dir() makes relative paths', () => {
@@ -47,7 +48,49 @@ describe('Dir', () => {
   it('.isTemp flows down to child Dirs', () => {
     const base = testDir.tempDir('temp-by-default');
     const child = base.dir('child');
-    assert(child.isTemp);
+    assert(child.options.temp);
+  });
+
+  it('.dir() merges options with parent options', () => {
+    const base = new Dir(testDir.filepath('merge-base'), { date: true });
+    const child = base.dir('child');
+    assert.equal(child.options.date, true);
+    assert(!child.options.temp);
+
+    const overridden = base.dir('override', { date: false });
+    assert.equal(overridden.options.date, false);
+  });
+
+  it('.tempDir() merges additional options with { temp: true }', () => {
+    const dated = testDir.tempDir('dated-temp', { date: true });
+    assert(dated.options.temp);
+    assert(dated.options.date);
+  });
+
+  it('filepath() and file() prefix with date when { date: true }', () => {
+    const dated = testDir.dir('dated-files', { date: true });
+    const filepath = dated.filepath('example.txt');
+    assert(/\d{8}-\d{6}-example\.txt$/.test(filepath));
+
+    const file = dated.file('example.txt');
+    assert(/\d{8}-\d{6}-example\.txt$/.test(file.path));
+
+    const undated = testDir.filepath('example.txt', { date: false });
+    assert(undated.endsWith('/example.txt'));
+  });
+
+  it('filepath() with no base ignores the date option and uses a date-based name', () => {
+    const dated = testDir.dir('dated-empty', { date: true });
+    const filepath = dated.filepath();
+    assert(/\d{8}-\d{6}$/.test(filepath));
+  });
+
+  it('throws on construction when platform is win32', () => {
+    const originalPlatform = process.platform;
+    Object.defineProperty(process, 'platform', { value: 'win32' });
+    assert.throws(() => new Dir('win32-test'));
+    Object.defineProperty(process, 'platform', { value: originalPlatform });
+    assert.equal(Env.process?.platform, originalPlatform);
   });
 
   it('Resolves filenames in folder', () => {
