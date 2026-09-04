@@ -1,8 +1,9 @@
 import * as fs from 'node:fs';
 import { merge } from 'lodash-es';
+import trash from 'trash';
 import sanitizeFilename from 'sanitize-filename';
 import { File } from './file.ts';
-import { parsePath } from './parse-path.ts';
+import { Path } from './path.ts';
 import { Format, Env } from '../core/_index.ts';
 
 type FileOptions = {
@@ -23,22 +24,21 @@ export type DirOptions = FileOptions & {
  * include `{ temp: true }` to enable the `.clear()` method
  */
 export class Dir {
-  protected inputPath: string;
-  protected resolved?: string;
+  #path: Path;
+  protected created = false;
   options: DirOptions;
 
   constructor(where = Format.date('ymd'), options: DirOptions = {}) {
     Env.throwIfWin32();
-    this.inputPath = where;
+    this.#path = new Path(where);
     this.options = options;
   }
 
   /**
-   * The path of the directory, which might not exist yet.
+   * Get the directory path. Unsafe to use with fs operations, since the directory might not exist yet.
    */
-  get pathUnsafe(): string {
-    if (this.resolved) return this.resolved;
-    return parsePath(this.inputPath).path;
+  get pathUnsafe() {
+    return this.#path.resolved;
   }
 
   /**
@@ -47,11 +47,11 @@ export class Dir {
    */
   get path(): string {
     // avoids calling mkdir every time path is read
-    if (!this.resolved) {
-      this.resolved = this.pathUnsafe;
-      fs.mkdirSync(this.resolved, { recursive: true });
+    if (!this.created) {
+      fs.mkdirSync(this.#path.resolved, { recursive: true });
+      this.created = true;
     }
-    return this.resolved;
+    return this.#path.resolved;
   }
 
   /**
@@ -60,11 +60,8 @@ export class Dir {
    * const example = new Dir('/path/to/folder');
    * console.log(example.name); // "folder"
    */
-  get name(): string {
-    return this.pathUnsafe
-      .split('/')
-      .filter(s => s.length > 0)
-      .at(-1)!;
+  get name(): string | undefined {
+    return this.#path.segments.at(-1);
   }
 
   /**
@@ -80,9 +77,8 @@ export class Dir {
    * // child.path = '/path/to/cwd/example/path/to/dir'
    */
   dir = (subPath = Format.date('ymd'), opts: DirOptions = {}): typeof this => {
-    const newPath = subPath.startsWith('/') ? subPath.slice(1) : subPath;
     const options = merge({}, this.options, opts);
-    return new (this.constructor as typeof Dir)(parsePath(newPath, this.path).path, options) as this;
+    return new (this.constructor as typeof Dir)(this.#path.join(subPath), options) as this;
   };
 
   /**
@@ -108,10 +104,10 @@ export class Dir {
    * // '/path/to/example/file.json'
    */
   filepath = (base?: string, opts: FileOptions = {}): string => {
-    if (!base) return parsePath(Format.date('ymd-hms'), this.path).path;
+    if (!base) return this.#path.join(Format.date('ymd-hms'));
     const options = merge({}, this.options, opts);
     const name = options.date ? `${Format.date('ymd-hms')}-${base}` : base;
-    return parsePath(this.sanitize(name), this.path).path;
+    return this.#path.join(this.sanitize(name));
   };
 
   /**
@@ -129,7 +125,7 @@ export class Dir {
   get contents(): (Dir | File)[] {
     return fs
       .readdirSync(this.path)
-      .map(name => (fs.statSync(parsePath(name, this.path).path).isDirectory() ? this.dir(name) : this.file(name)));
+      .map(name => (fs.statSync(this.#path.join(name)).isDirectory() ? this.dir(name) : this.file(name)));
   }
 
   /**
@@ -201,11 +197,14 @@ export class Dir {
   }
 
   /**
-   * Deletes the contents of the directory. Only allowed if created with `temp` option set to `true` (or created with `dir.tempDir` method).
+   * Moves the directory to the system's trash. Only allowed when:
+   * - Dir created with `{ temp: true }` option
+   * - At least one path segment starts with a dot '.'
    */
-  clear = (): void => {
+  clear = async (): Promise<void> => {
     if (!this.options.temp) throw new Error('Dir is not temporary');
-    fs.rmSync(this.path, { recursive: true, force: true });
+    this.#path.canDelete();
+    await trash(this.path);
     fs.mkdirSync(this.path, { recursive: true });
   };
 }

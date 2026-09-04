@@ -3,7 +3,6 @@ import { snapshot } from './snapshot.ts';
 import { temp } from '../node/dir.ts';
 
 const testDir = temp.tempDir('snapshot');
-testDir.clear();
 
 describe('snapshot', () => {
   it('Captures Error details', () => {

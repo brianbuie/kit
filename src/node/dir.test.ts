@@ -1,10 +1,9 @@
-import { describe, it, assert } from 'vitest';
+import { describe, it, assert, expect } from 'vitest';
 import { temp, Dir } from './dir.ts';
 import { Env } from '../core/_index.ts';
 
 describe('Dir', () => {
   const testDir = temp.dir('dir-test');
-  testDir.clear();
 
   it('Sanitizes filenames', () => {
     const name = testDir.sanitize(':/something/else.json');
@@ -139,15 +138,15 @@ describe('Dir', () => {
     );
   });
 
-  it('Only clears temporary directories', () => {
+  it('Only clears temporary directories', async () => {
     const regular = new Dir(testDir.filepath('not-temporary'));
     const temporary = testDir.tempDir('clearable');
     const file = temporary.file('data.txt');
 
     file.writeText('data');
 
-    assert.throws(() => regular.clear(), /Dir is not temporary/);
-    temporary.clear();
+    await expect(regular.clear()).rejects.toThrow(/Dir is not temporary/);
+    await temporary.clear();
     assert.deepEqual(temporary.contents, []);
   });
 

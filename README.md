@@ -61,6 +61,7 @@ export default config;
 
 - Added `{ date: true }` option on `Dir` to prefix all files with the date
 - `Env.throwIfWin32`
+- locked down `Dir.clear`, to prevent accidents. Now uses `trash`, so mistakes are recoverable.
 
 ## 3.4.0
 

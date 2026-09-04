@@ -3,7 +3,6 @@ import { temp } from './dir.ts';
 import { File } from './file.ts';
 
 const testDir = temp.tempDir('file-test');
-testDir.clear();
 
 const thing = {
   a: 'string',

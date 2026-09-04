@@ -6,7 +6,7 @@ import trash from 'trash';
 import mime from 'mime-types';
 import type { Dir } from './dir.ts';
 import { Env } from '../core/_index.ts';
-import { parsePath } from './parse-path.ts';
+import { Path } from './path.ts';
 
 /**
  * Shared filesystem operations for the public File facade and format files.
@@ -39,7 +39,7 @@ export class FileBase {
 
   constructor(filepath: string) {
     Env.throwIfWin32();
-    this.path = parsePath(filepath).path;
+    this.path = new Path(filepath).resolved;
     // Need to assume last segment in filepath is the filename, even if it doesn't have an extension
     const { base, name, dir, ext } = path.parse(this.path);
     this.dir = dir;
@@ -102,8 +102,7 @@ export class FileBase {
    * Create a new File instance at a new location.
    */
   protected cloneTo = (dir: string | Dir, newBase?: string): this => {
-    const { path } = parsePath(typeof dir === 'string' ? dir : dir.path);
-    const newPath = [path, newBase || this.base].join('/');
+    const newPath = new Path(typeof dir === 'string' ? dir : dir.path).join(newBase || this.base);
     return new (this.constructor as new (filepath: string) => this)(newPath);
   };
 
