@@ -57,6 +57,10 @@ export default config;
 
 # Changelog
 
+## 3.4.0
+
+- Remove confusing `Fetcher.buildHeaders` override function. Just extend the class for method overrides.
+
 ## 3.3.2
 
 - New `Log.timer` method.

@@ -9,7 +9,6 @@ type QueryVal = string | number | boolean | null | undefined;
 export type Query = Record<string, QueryVal | QueryVal[]>;
 
 export type FetchHeaders = Record<string, string | undefined>;
-export type BuildHeaders = (r: Route, o?: FetchOptions) => FetchHeaders | Promise<FetchHeaders>;
 
 export type FetchTransport = (request: Request) => Promise<Response>;
 export type FetchDelay = (ms: number) => Promise<void>;
@@ -24,7 +23,6 @@ export type FetchOptions = RequestInit & {
   retryDelay?: number;
   transport?: FetchTransport;
   delay?: FetchDelay;
-  buildHeaders?: BuildHeaders;
 };
 
 function pickRequestInit(opts: FetchOptions) {
@@ -97,12 +95,13 @@ export class Fetcher {
   };
 
   /**
-   * Merges options to build the headers for the request.
-   * A custom `buildHeaders` function can be provided in FetchOptions to override this
+   * Merge options to build the headers for the request.
+   * This method exists primarily for overriding after extending the class.
+   * You can create this method on the child class and it'll be used in the normal fetch method.
    */
-  buildHeaders: BuildHeaders = async (route, opts = {}) => {
+  buildHeaders = async (route: Route, opts: FetchOptions = {}): Promise<FetchHeaders> => {
     const merged = merge({}, this.defaultOptions, opts);
-    return merged.buildHeaders?.(route, merged) ?? merged.headers!;
+    return merged.headers || {};
   };
 
   /**
