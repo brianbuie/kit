@@ -72,6 +72,12 @@ describe('Fetcher', () => {
     assert(url.href.includes('multiple=2'));
   });
 
+  it('Handles query param overrides without duplicating', () => {
+    const [url] = statusApi.buildUrl('/', { query: { test: 1 } });
+    const [url2] = statusApi.buildUrl(url, { query: { test: 2 } });
+    assert.deepEqual(url2.search, '?test=2');
+  });
+
   it('Accepts a base URL as the first constructor argument', () => {
     const api = new Fetcher('https://example.org');
     const [url] = api.buildUrl('/test');

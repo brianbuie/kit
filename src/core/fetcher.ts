@@ -89,7 +89,7 @@ export class Fetcher {
       }
     });
     const search = params.length > 0 ? '?' + new URLSearchParams(params).toString() : '';
-    const url = new URL(route + search, mergedOptions.base);
+    const url = new URL(routeUrl.pathname + search, mergedOptions.base);
     const domain = extractDomain(url.href) as string;
     return [url, domain];
   };
@@ -138,8 +138,11 @@ export class Fetcher {
       attempt++;
       const [req] = await this.buildRequest(route, opts);
       const res = await options.transport!(req)
-        .then(r => {
-          if (!r.ok) throw new Error(r.statusText);
+        .then(async r => {
+          if (!r.ok) {
+            const body = await r.text();
+            throw new Error(`${r.statusText}: ${body}`);
+          }
           return r;
         })
         .catch(async error => {
