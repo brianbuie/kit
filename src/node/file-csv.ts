@@ -47,7 +47,7 @@ export class FileCsv<Row extends object> extends FileBase {
       if (this.options.parseBooleans && val.toLowerCase() === 'false') return false;
       if (this.options.parseBooleans && val.toLowerCase() === 'true') return true;
       if (this.options.parseNulls && (val.length === 0 || val.toLowerCase() === 'null')) return null;
-      if (this.options.parseNumbers && /^[\.0-9]+$/.test(val)) return Number(val);
+      if (this.options.parseNumbers && /^[-\.\d]+$/.test(val)) return Number(val);
       return val;
     };
 

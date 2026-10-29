@@ -10,6 +10,7 @@ const thing = {
   c: true,
   d: false,
   e: null,
+  f: -2.5,
 };
 
 describe('File', () => {
