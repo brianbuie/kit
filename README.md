@@ -57,6 +57,11 @@ export default config;
 
 # Changelog
 
+## 3.6.0
+
+- `Dir.videos` and `Dir.images` return instances of `FileVideo` and `FileImage`, instead of the generic `File`.
+- `Dir.clear` falls back to `fs.rmdir` when `trash` fails (e.g. smb volume on MacOS)
+
 ## 3.5.0
 
 - Added `{ date: true }` option on `Dir` to prefix all files with the date

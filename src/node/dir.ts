@@ -3,8 +3,10 @@ import { merge } from 'lodash-es';
 import trash from 'trash';
 import sanitizeFilename from 'sanitize-filename';
 import { File } from './file.ts';
+import type { FileVideo } from './file-video.ts';
+import type { FileImage } from './file-image.ts';
 import { Path } from './path.ts';
-import { Format, Env } from '../core/_index.ts';
+import { Format, Env, Log } from '../core/_index.ts';
 
 type FileOptions = {
   date?: boolean;
@@ -145,15 +147,15 @@ export class Dir {
   /**
    * All files with MIME type that includes "video"
    */
-  get videos(): File[] {
-    return this.files.filter(f => f.type?.includes('video'));
+  get videos(): FileVideo[] {
+    return this.files.filter(f => f.type?.includes('video')).map(f => new File.video(f.path));
   }
 
   /**
    * All files with MIME type that includes "image"
    */
-  get images(): File[] {
-    return this.files.filter(f => f.type?.includes('image'));
+  get images(): FileImage[] {
+    return this.files.filter(f => f.type?.includes('image')).map(f => new File.image(f.path));
   }
 
   /**
@@ -204,7 +206,9 @@ export class Dir {
   clear = async (): Promise<void> => {
     if (!this.options.temp) throw new Error('Dir is not temporary');
     this.#path.canDelete();
-    await trash(this.path);
+    await trash(this.path).catch(() => {
+      fs.rmdirSync(this.path, { recursive: true });
+    });
     fs.mkdirSync(this.path, { recursive: true });
   };
 }

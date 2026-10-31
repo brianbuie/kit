@@ -39,7 +39,7 @@
     "vitest": "^4.1.11"
   },
   "peerDependencies": {
-    "quicktype-core": "^23.2.6"
+    "quicktype-core": "*"
   },
   "peerDependenciesMeta": {
     "quicktype-core": {
