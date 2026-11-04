@@ -80,6 +80,3 @@ export class File extends FileBase {
     return FileVideo;
   }
 }
-
-export { type FileCsvOptions } from './file-csv.ts';
-export { type VideoDimensions } from './file-video.ts';

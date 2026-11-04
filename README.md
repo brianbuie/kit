@@ -57,6 +57,10 @@ export default config;
 
 # Changelog
 
+## 3.6.1
+
+- Export types for `FileCsv`, `FileImage`, `FileJson`, `FileNdjson`, `FileVideo`
+
 ## 3.6.0
 
 - `Dir.videos` and `Dir.images` return instances of `FileVideo` and `FileImage`, instead of the generic `File`.
