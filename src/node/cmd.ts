@@ -10,15 +10,6 @@ export type CmdArgs = string | (string | number | null | undefined | CmdArgs)[];
  * @returns Promise that resolves with content of STDOUT. Rejects with output of STDERR
  */
 export class Cmd {
-  static bin = '/usr/local/bin';
-
-  /**
-   * configure global location of bin files
-   */
-  static configure = ({ bin }: { bin: string }): void => {
-    this.bin = bin;
-  };
-
   static args = (args: CmdArgs): string[] => {
     return typeof args === 'string'
       ? parseArgs(args)
@@ -37,8 +28,7 @@ export class Cmd {
     return new Promise((resolve, reject) => {
       let stdout = '';
       let stderr = '';
-      const command = cmd.includes('/') ? cmd : `${this.bin}/${cmd}`;
-      const child = spawn(command, this.args(args), options);
+      const child = spawn(cmd, this.args(args), options);
       child.stdout.on('data', chunk => {
         stdout += chunk.toString();
       });
@@ -54,7 +44,7 @@ export class Cmd {
   };
 
   /**
-   * Run ffmpeg for video processing (ffmpeg needs to be installed separately). Specify ffmpeg location with `FFMPEG_PATH` environment variable.
+   * Run ffmpeg for video processing (ffmpeg needs to be installed separately). ffmpeg location should be in $PATH or `FFMPEG_PATH` environment variable.
    */
   static ffmpeg = async (args: CmdArgs) => {
     const cmd = process.env.FFMPEG_PATH || 'ffmpeg';
@@ -62,7 +52,7 @@ export class Cmd {
   };
 
   /**
-   * Use ffprobe to get video stream dimensions (ffprobe needs to be installed separately). Specify ffmpeg location with `FFPROBE_PATH` environment variable.
+   * Use ffprobe to get video stream dimensions (ffprobe needs to be installed separately). ffprobe location should be in $PATH or `FFPROBE_PATH` environment variable.
    */
   static ffprobe = async (args: CmdArgs) => {
     const cmd = process.env.FFPROBE_PATH || 'ffprobe';
