@@ -21,6 +21,21 @@ export class Cmd {
   };
 
   /**
+   * Spawn a child process attached to the current process's stdin/stdout/stderr, for interactive commands.
+   * @returns Promise that resolves with the exit code. Rejects if the process fails to spawn or is killed by a signal.
+   */
+  static pipe = async (cmd: string, args: CmdArgs, opts?: SpawnOptionsWithoutStdio): Promise<number> => {
+    return new Promise((resolve, reject) => {
+      const child = spawn(cmd, this.args(args), { ...opts, stdio: 'inherit' });
+      child.on('error', reject);
+      child.on('close', (code, signal) => {
+        if (signal) return reject(new Error(`${cmd} terminated by ${signal}`));
+        resolve(code ?? 0);
+      });
+    });
+  };
+
+  /**
    * Spawn child process. If command doesn't include "/", `this.bin` path will be added to the beginning of it.
    */
   static run = async (cmd: string, args: CmdArgs, opts?: SpawnOptionsWithoutStdio): Promise<string> => {

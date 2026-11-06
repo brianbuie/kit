@@ -57,6 +57,11 @@ export default config;
 
 # Changelog
 
+## 3.7.0
+
+- New `Cmd.pipe` method for interactive commands.
+- Removed `Cmd.bin` config
+
 ## 3.6.1
 
 - Export types for `FileCsv`, `FileImage`, `FileJson`, `FileNdjson`, `FileVideo`
