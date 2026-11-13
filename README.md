@@ -66,6 +66,10 @@ export default config;
 
 # Changelog
 
+## 3.7.2
+
+- Update `date-fns` imports to only specific modules.
+
 ## 3.7.1
 
 - Added individual module exports to speed up imports when not using a bundler or build step. `import { Fetcher } from "@brianbuie/kit/fetcher"`

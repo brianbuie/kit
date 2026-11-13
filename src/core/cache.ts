@@ -1,4 +1,6 @@
-import { add, isAfter, type Duration } from 'date-fns';
+import { add } from 'date-fns/add';
+import { isAfter } from 'date-fns/isAfter';
+import type { Duration } from 'date-fns';
 import { Store } from './store.ts';
 
 export type CacheOptions<T> = {

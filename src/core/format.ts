@@ -1,4 +1,6 @@
-import { format, formatISO, type DateArg } from 'date-fns';
+import { format } from 'date-fns/format';
+import { formatISO } from 'date-fns/formatISO';
+import type { DateArg } from 'date-fns';
 import formatDuration from 'format-duration';
 
 /**
