@@ -8,7 +8,7 @@ describe('Fetcher', () => {
 
   it('Makes URL', () => {
     const route = '/example/route';
-    const [url] = statusApi.buildUrl(route);
+    const url = statusApi.buildUrl(route);
     assert(url.href.includes(route));
   });
 
@@ -22,39 +22,33 @@ describe('Fetcher', () => {
     throw new Error('Ignored invalid URL');
   });
 
-  it('Identifies the correct domain', () => {
-    const test = new Fetcher({ base: 'https://subdomain.example.org' });
-    const [_, domain] = test.buildUrl('');
-    assert(domain === 'example.org');
-  });
-
   it('Handles query parameters', () => {
-    const [url] = statusApi.buildUrl('/', { query: { key: 'value' } });
+    const url = statusApi.buildUrl('/', { query: { key: 'value' } });
     assert(url.href.includes('?key=value'));
   });
 
   it('Handles undefined query params', () => {
-    const [url] = statusApi.buildUrl('/', { query: { key: undefined } });
+    const url = statusApi.buildUrl('/', { query: { key: undefined } });
     assert(!url.href.includes('key'));
   });
 
   it('Merges query parameters', () => {
-    const [url] = statusApi.buildUrl('/?existing=1', { query: { added: 2 } });
+    const url = statusApi.buildUrl('/?existing=1', { query: { added: 2 } });
     assert(url.href.includes('existing=1&added=2'));
   });
 
   it('Overrides route query parameters when provided as options', () => {
-    const [url] = statusApi.buildUrl('/param=1', { query: { param: 2 } });
+    const url = statusApi.buildUrl('/param=1', { query: { param: 2 } });
     assert(url.search === '?param=2');
   });
 
   it('Allows overriding the base with new options', () => {
-    const [url] = statusApi.buildUrl('/test', { base: 'https://www.google.com' });
+    const url = statusApi.buildUrl('/test', { base: 'https://www.google.com' });
     assert(url.href.includes('google.com'));
   });
 
   it('Keeps falsey query params', () => {
-    const [url] = statusApi.buildUrl('/', { query: { zero: 0, false: false, null: null } });
+    const url = statusApi.buildUrl('/', { query: { zero: 0, false: false, null: null } });
     assert(url.href.includes('zero=0'));
     assert(url.href.includes('false=false'));
     assert(url.href.includes('null=null'));
@@ -62,25 +56,25 @@ describe('Fetcher', () => {
 
   it('Handles no query params', () => {
     const route = '/';
-    const [url] = statusApi.buildUrl(route);
+    const url = statusApi.buildUrl(route);
     assert(url.href === statusApi.defaultOptions.base + route);
   });
 
   it('Handles array query param', () => {
-    const [url] = statusApi.buildUrl('/', { query: { multiple: [1, 2] } });
+    const url = statusApi.buildUrl('/', { query: { multiple: [1, 2] } });
     assert(url.href.includes('multiple=1'));
     assert(url.href.includes('multiple=2'));
   });
 
   it('Handles query param overrides without duplicating', () => {
-    const [url] = statusApi.buildUrl('/', { query: { test: 1 } });
-    const [url2] = statusApi.buildUrl(url, { query: { test: 2 } });
+    const url = statusApi.buildUrl('/', { query: { test: 1 } });
+    const url2 = statusApi.buildUrl(url, { query: { test: 2 } });
     assert.deepEqual(url2.search, '?test=2');
   });
 
   it('Accepts a base URL as the first constructor argument', () => {
     const api = new Fetcher('https://example.org');
-    const [url] = api.buildUrl('/test');
+    const url = api.buildUrl('/test');
     assert(url.href === 'https://example.org/test');
   });
 

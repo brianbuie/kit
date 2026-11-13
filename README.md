@@ -66,6 +66,12 @@ export default config;
 
 # Changelog
 
+## 3.8.0
+
+- Remove domain from `Fetcher`'s `buildUrl` method (remove dependency on `extract-domain` package)
+- `buildUrl` method now returns `URL` instead of `[URL, string]`, which will break in places that call the method directly. This should get caught when typechecking though.
+- `fetchText`, `fetchJson` methods shouldn't be affected.
+
 ## 3.7.2
 
 - Update `date-fns` imports to only specific modules.

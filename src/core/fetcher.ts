@@ -1,5 +1,4 @@
 import { merge, pick } from 'lodash-es';
-import extractDomain from 'extract-domain';
 import { Log } from './log.ts';
 import { timeout } from './timeout.ts';
 
@@ -73,7 +72,7 @@ export class Fetcher {
    * 3. options.query
    * @returns [url, domain]
    */
-  buildUrl = (route: Route, opts: FetchOptions = {}): [URL, string] => {
+  buildUrl = (route: Route, opts: FetchOptions = {}): URL => {
     const routeUrl = route instanceof URL ? route : new URL(route, opts.base || this.defaultOptions.base);
     const routeQuery = Object.fromEntries(routeUrl.searchParams);
     const mergedOptions = merge({}, this.defaultOptions, { query: routeQuery }, opts);
@@ -90,8 +89,7 @@ export class Fetcher {
     });
     const search = params.length > 0 ? '?' + new URLSearchParams(params).toString() : '';
     const url = new URL(routeUrl.pathname + search, mergedOptions.base);
-    const domain = extractDomain(url.href) as string;
-    return [url, domain];
+    return url;
   };
 
   /**
@@ -108,7 +106,7 @@ export class Fetcher {
    * Builds request, merging defaultOptions and provided options.
    * Includes Abort signal for timeout
    */
-  buildRequest = async (route: Route, opts: FetchOptions = {}): Promise<[Request, FetchOptions, string]> => {
+  buildRequest = async (route: Route, opts: FetchOptions = {}): Promise<[Request, FetchOptions]> => {
     const merged = merge({}, this.defaultOptions, opts);
     const init = pickRequestInit(merged);
     init.headers = (await this.buildHeaders(route, merged)) as Record<string, string>;
@@ -120,9 +118,9 @@ export class Fetcher {
     if (merged.timeout) {
       init.signal = AbortSignal.timeout(merged.timeout);
     }
-    const [url, domain] = this.buildUrl(route, merged);
+    const url = this.buildUrl(route, merged);
     const req = new Request(url, init);
-    return [req, merged, domain];
+    return [req, merged];
   };
 
   /**
