@@ -1,6 +1,7 @@
 import { merge } from 'lodash-es';
 import * as qt from 'quicktype-core';
-import { File, cwd } from '../node/_index.ts';
+import { cwd } from '../node/dir.ts';
+import { File } from '../node/file.ts';
 
 /**
  * IMPORTANT: [quicktype-core](https://github.com/glideapps/quicktype) needs to be installed in the project.

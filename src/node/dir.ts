@@ -6,7 +6,8 @@ import { File } from './file.ts';
 import type { FileVideo } from './file-video.ts';
 import type { FileImage } from './file-image.ts';
 import { Path } from './path.ts';
-import { Format, Env, Log } from '../core/_index.ts';
+import { Env } from '../core/env.ts';
+import { Format } from '../core/format.ts';
 
 type FileOptions = {
   date?: boolean;

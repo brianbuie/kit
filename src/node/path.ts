@@ -1,5 +1,5 @@
 import { resolve, join } from 'node:path';
-import { Env } from '../core/_index.ts';
+import { Env } from '../core/env.ts';
 
 export class Path {
   protected input;

@@ -56,6 +56,58 @@
       "types": "./dist/core.d.ts",
       "default": "./dist/core.js"
     },
+    "./cache": {
+      "types": "./dist/cache.d.mts",
+      "default": "./dist/cache.mjs"
+    },
+    "./cmd": {
+      "types": "./dist/cmd.d.mts",
+      "default": "./dist/cmd.mjs"
+    },
+    "./core/cache": {
+      "types": "./dist/core/cache.d.ts",
+      "default": "./dist/core/cache.js"
+    },
+    "./dir": {
+      "types": "./dist/dir.d.mts",
+      "default": "./dist/dir.mjs"
+    },
+    "./env": {
+      "types": "./dist/env.d.ts",
+      "default": "./dist/env.js"
+    },
+    "./fetcher": {
+      "types": "./dist/fetcher.d.ts",
+      "default": "./dist/fetcher.js"
+    },
+    "./file": {
+      "types": "./dist/file.d.mts",
+      "default": "./dist/file.mjs"
+    },
+    "./format": {
+      "types": "./dist/format.d.ts",
+      "default": "./dist/format.js"
+    },
+    "./log": {
+      "types": "./dist/log.d.ts",
+      "default": "./dist/log.js"
+    },
+    "./path": {
+      "types": "./dist/path.d.mts",
+      "default": "./dist/path.mjs"
+    },
+    "./snapshot": {
+      "types": "./dist/snapshot.d.ts",
+      "default": "./dist/snapshot.js"
+    },
+    "./store": {
+      "types": "./dist/store.d.ts",
+      "default": "./dist/store.js"
+    },
+    "./timeout": {
+      "types": "./dist/timeout.d.ts",
+      "default": "./dist/timeout.js"
+    },
     "./type-writer": {
       "types": "./dist/type-writer.d.mts",
       "default": "./dist/type-writer.mjs"

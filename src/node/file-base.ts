@@ -5,7 +5,7 @@ import { finished } from 'node:stream/promises';
 import trash from 'trash';
 import mime from 'mime-types';
 import type { Dir } from './dir.ts';
-import { Env } from '../core/_index.ts';
+import { Env } from '../core/env.ts';
 import { Path } from './path.ts';
 
 /**

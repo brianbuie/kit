@@ -14,6 +14,15 @@ npm add @brianbuie/kit
 import { Fetcher } from '@brianbuie/kit';
 ```
 
+For faster startup without a bundler, import only the modules you use:
+
+```ts
+import { Fetcher } from '@brianbuie/kit/fetcher';
+import { Dir } from '@brianbuie/kit/dir';
+```
+
+Individual modules are available as package subpaths, such as `cache`, `cmd`, `dir`, `env`, `fetcher`, `file`, `format`, `log`, `path`, `snapshot`, `store`, and `timeout`. The platform-neutral cache is available from `@brianbuie/kit/core/cache`; `@brianbuie/kit/cache` is the Node.js (file) cache.
+
 Consumers should get the correct modules when importing from `@brianbuie/kit`. If you run into issues with node.js's modules being bundled for the browser, you can import from `@brianbuie/kit/core` instead.
 
 ```ts
@@ -56,6 +65,10 @@ export default config;
 ```
 
 # Changelog
+
+## 3.7.1
+
+- Added individual module exports to speed up imports when not using a bundler or build step. `import { Fetcher } from "@brianbuie/kit/fetcher"`
 
 ## 3.7.0
 
