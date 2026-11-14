@@ -1,3 +1,6 @@
+> [!NOTE]
+> AI has assisted with debugging and writing tests for the modules in this package. The actual code was written by a dumb person.
+
 # Kit
 
 Basic tools for quick projects
@@ -66,6 +69,10 @@ export default config;
 ```
 
 # Changelog
+
+## 3.9.1
+
+- new `JsonDb` module for a quick and dirty database in a json file
 
 ## 3.9.0
 

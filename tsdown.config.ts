@@ -25,6 +25,7 @@ export default defineConfig([
       'dir': 'src/node/dir.ts',
       'file': 'src/node/file.ts',
       'json-cache': 'src/node/json-cache.ts',
+      'json-db': 'src/node/json-db.ts',
       'path': 'src/node/path.ts',
     },
     platform: 'node',

@@ -1,5 +1,4 @@
 export * from '../core/_index.ts';
-export { JsonCache, type JsonCacheOptions } from './json-cache.ts';
 export { Cmd, type CmdArgs } from './cmd.ts';
 export { Dir, type DirOptions, temp, cwd } from './dir.ts';
 export { File } from './file.ts';
@@ -8,4 +7,6 @@ export type { FileImage, ImageDimensions } from './file-image.ts';
 export type { FileJson } from './file-json.ts';
 export type { FileNdjson } from './file-ndjson.ts';
 export type { FileVideo, VideoDimensions } from './file-video.ts';
+export { JsonCache, type JsonCacheOptions } from './json-cache.ts';
+export { JsonDb } from './json-db.ts';
 export { Path } from './path.ts';

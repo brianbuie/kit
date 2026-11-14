@@ -87,6 +87,10 @@
       "types": "./dist/json-cache.d.mts",
       "default": "./dist/json-cache.mjs"
     },
+    "./json-db": {
+      "types": "./dist/json-db.d.mts",
+      "default": "./dist/json-db.mjs"
+    },
     "./log": {
       "types": "./dist/log.d.ts",
       "default": "./dist/log.js"
