@@ -1,8 +1,8 @@
-import { Cache as CacheCore, type CacheOptions as CacheCoreOptions, type CacheEntry } from '../core/cache.ts';
+import { Cache, type CacheOptions, type CacheEntry } from '../core/cache.ts';
 import { type FileJson } from './file-json.ts';
 import { Dir } from './dir.ts';
 
-export type CacheOptions<T> = CacheCoreOptions<T> & {
+export type JsonCacheOptions<T> = CacheOptions<T> & {
   dir?: string | Dir;
 };
 
@@ -15,10 +15,10 @@ export type CacheOptions<T> = CacheCoreOptions<T> & {
  * const ex2 = new Cache({ key: 'ex2', dir: '.cache' }); // file at './.cache/ex2.json', 5 minute ttl by default
  * const [ex2Data, isFresh] = ex2.read() // [undefined, false]
  */
-export class Cache<T> extends CacheCore<T> {
+export class JsonCache<T> extends Cache<T> {
   file?: FileJson<CacheEntry<T>>;
 
-  constructor({ dir, key, ttl, data }: CacheOptions<T>) {
+  constructor({ dir, key, ttl, data }: JsonCacheOptions<T>) {
     let file: FileJson<CacheEntry<T>> | undefined;
     if (dir) {
       const cacheDir = dir instanceof Dir ? dir : new Dir(dir, { temp: true });

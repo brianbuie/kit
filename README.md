@@ -21,12 +21,13 @@ import { Fetcher } from '@brianbuie/kit/fetcher';
 import { Dir } from '@brianbuie/kit/dir';
 ```
 
-Individual modules are available as package subpaths, such as `cache`, `cmd`, `dir`, `env`, `fetcher`, `file`, `format`, `log`, `path`, `snapshot`, `store`, and `timeout`. The platform-neutral cache is available from `@brianbuie/kit/core/cache`; `@brianbuie/kit/cache` is the Node.js (file) cache.
-
 Consumers should get the correct modules when importing from `@brianbuie/kit`. If you run into issues with node.js's modules being bundled for the browser, you can import from `@brianbuie/kit/core` instead.
 
+If you're not using a bundler and import speed is an issue, you can import modules individually:
+
 ```ts
-import { Fetcher } from '@brianbuie/kit/core';
+import { Cache } from '@brianbuie/kit/cache';
+import { Cmd } from '@brianbuie/kit/cmd';
 ```
 
 The `TypeWriter` module is separate from the main export and needs `quicktype-core` installed as a peer dependency.
@@ -65,6 +66,10 @@ export default config;
 ```
 
 # Changelog
+
+## 3.9.0
+
+- The node.js file-based `Cache` is now `JsonCache`, the browser-safe `Cache` is unchanged.
 
 ## 3.8.0
 

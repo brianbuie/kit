@@ -5,7 +5,7 @@ export default defineConfig([
     // cross-platform parts
     entry: {
       core: 'src/core/_index.ts',
-      'core/cache': 'src/core/cache.ts',
+      cache: 'src/core/cache.ts',
       env: 'src/core/env.ts',
       fetcher: 'src/core/fetcher.ts',
       format: 'src/core/format.ts',
@@ -20,12 +20,12 @@ export default defineConfig([
   {
     // node.js parts and core exports
     entry: {
-      node: 'src/node/_index.ts',
-      cache: 'src/node/cache.ts',
-      cmd: 'src/node/cmd.ts',
-      dir: 'src/node/dir.ts',
-      file: 'src/node/file.ts',
-      path: 'src/node/path.ts',
+      'node': 'src/node/_index.ts',
+      'cmd': 'src/node/cmd.ts',
+      'dir': 'src/node/dir.ts',
+      'file': 'src/node/file.ts',
+      'json-cache': 'src/node/json-cache.ts',
+      'path': 'src/node/path.ts',
     },
     platform: 'node',
     dts: { sourcemap: true },

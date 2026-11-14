@@ -1,5 +1,5 @@
 export * from '../core/_index.ts';
-export { Cache, type CacheOptions } from './cache.ts';
+export { JsonCache, type JsonCacheOptions } from './json-cache.ts';
 export { Cmd, type CmdArgs } from './cmd.ts';
 export { Dir, type DirOptions, temp, cwd } from './dir.ts';
 export { File } from './file.ts';

@@ -1,11 +1,11 @@
 import { describe, it, assert } from 'vitest';
-import { Cache } from './cache.ts';
+import { JsonCache } from './json-cache.ts';
 import { temp } from './dir.ts';
 
-describe('Cache', () => {
+describe('JsonCache', () => {
   it('uses an explicitly provided directory', () => {
     const dir = temp.tempDir('cache-test');
-    const cache = new Cache<string>({ key: 'value', ttl: 5, dir });
+    const cache = new JsonCache<string>({ key: 'value', ttl: 5, dir });
 
     cache.write('cached');
 
@@ -15,14 +15,14 @@ describe('Cache', () => {
 
   it('writes falsy initial data', () => {
     const dir = temp.tempDir('cache-initial-data-test');
-    const cache = new Cache<number>({ key: 'count', data: 0, dir });
+    const cache = new JsonCache<number>({ key: 'count', data: 0, dir });
 
     assert.deepEqual(cache.read(), [0, true]);
   });
 
   it('returns stale cached data after its TTL expires', () => {
     const dir = temp.tempDir('cache-stale-test');
-    const cache = new Cache<string>({ key: 'value', ttl: -1, dir });
+    const cache = new JsonCache<string>({ key: 'value', ttl: -1, dir });
 
     cache.write('cached');
 

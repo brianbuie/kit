@@ -56,16 +56,12 @@
       "default": "./dist/core.js"
     },
     "./cache": {
-      "types": "./dist/cache.d.mts",
-      "default": "./dist/cache.mjs"
+      "types": "./dist/cache.d.ts",
+      "default": "./dist/cache.js"
     },
     "./cmd": {
       "types": "./dist/cmd.d.mts",
       "default": "./dist/cmd.mjs"
-    },
-    "./core/cache": {
-      "types": "./dist/core/cache.d.ts",
-      "default": "./dist/core/cache.js"
     },
     "./dir": {
       "types": "./dist/dir.d.mts",
@@ -86,6 +82,10 @@
     "./format": {
       "types": "./dist/format.d.ts",
       "default": "./dist/format.js"
+    },
+    "./json-cache": {
+      "types": "./dist/json-cache.d.mts",
+      "default": "./dist/json-cache.mjs"
     },
     "./log": {
       "types": "./dist/log.d.ts",
@@ -125,7 +125,7 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.22.0",
+  "packageManager": "pnpm@12.18.0",
   "type": "module",
   "sideEffects": false
 }
