@@ -17,13 +17,6 @@ npm add @brianbuie/kit
 import { Fetcher } from '@brianbuie/kit';
 ```
 
-For faster startup without a bundler, import only the modules you use:
-
-```ts
-import { Fetcher } from '@brianbuie/kit/fetcher';
-import { Dir } from '@brianbuie/kit/dir';
-```
-
 Consumers should get the correct modules when importing from `@brianbuie/kit`. If you run into issues with node.js's modules being bundled for the browser, you can import from `@brianbuie/kit/core` instead.
 
 If you're not using a bundler and import speed is an issue, you can import modules individually:
