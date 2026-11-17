@@ -57,6 +57,11 @@ export class FileBase {
     return fs.existsSync(this.path);
   }
 
+  throwIfMissing = () => {
+    if (!this.exists) throw new Error(`File '${this.path}' does not exist.`);
+    return this as this & { exists: true };
+  };
+
   get stats(): Partial<fs.Stats> {
     return this.exists ? fs.statSync(this.path) : {};
   }

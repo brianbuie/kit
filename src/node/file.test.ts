@@ -40,6 +40,11 @@ describe('FileType', () => {
     assert(eg1.path === eg2.path && eg2.path === eg3.path);
   });
 
+  it('Throws when throwIfMissing() called on missing file', () => {
+    const noFile = testDir.file('does-not-exist.txt');
+    assert.throws(() => noFile.throwIfMissing());
+  });
+
   it('Deletes files', () => {
     const test = testDir.file('delete-test.txt');
     test.writeText('test');

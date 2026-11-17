@@ -63,6 +63,11 @@ export default config;
 
 # Changelog
 
+## 3.9.2
+
+- New `File.throwIfMissing()` and `Dir.throwIfMissing()` methods to throw an error when a file or directory doesn't exist. It returns `this`, so it can be chained with other methods.
+- Updated comments on all `Dir` methods to clarify which ones will create the directory on the filesystem when it doesn't exist.
+
 ## 3.9.1
 
 - new `JsonDb` module for a quick and dirty database in a json file

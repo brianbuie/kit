@@ -39,9 +39,18 @@ describe('JsonDb', () => {
     fileDb.insert(item('file'));
     jsonFileDb.insert(item('json-file'));
 
-    assert.deepEqual(pathDb.items.map(value => value.id), ['path']);
-    assert.deepEqual(fileDb.items.map(value => value.id), ['file']);
-    assert.deepEqual(jsonFileDb.items.map(value => value.id), ['json-file']);
+    assert.deepEqual(
+      pathDb.items.map(value => value.id),
+      ['path'],
+    );
+    assert.deepEqual(
+      fileDb.items.map(value => value.id),
+      ['file'],
+    );
+    assert.deepEqual(
+      jsonFileDb.items.map(value => value.id),
+      ['json-file'],
+    );
   });
 
   it('inserts items and rejects duplicate IDs', () => {

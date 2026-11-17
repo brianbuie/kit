@@ -19,6 +19,14 @@ describe('Dir', () => {
     assert(testDir.dirs.length > 0);
   });
 
+  it('Throws when throwIfMissing() called on missing dir', () => {
+    const missing = testDir.dir('does-not-exist');
+    assert(!missing.exists);
+    assert.throws(() => missing.throwIfMissing());
+    // make sure it wasn't created in the previous throwIfMissing()
+    assert.throws(() => missing.throwIfMissing());
+  });
+
   it('Creates sub directory using date when no input provided', () => {
     const sub = testDir.dir();
     assert(sub.path.includes(testDir.path));

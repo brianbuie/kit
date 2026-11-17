@@ -45,6 +45,21 @@ export class Dir {
   }
 
   /**
+   * Check if the current directory exists (does not create the directory on the filesystem)
+   */
+  get exists() {
+    return fs.existsSync(this.pathUnsafe) && fs.statSync(this.pathUnsafe).isDirectory;
+  }
+
+  /**
+   * Throws an error if the current directory doesn't exist.
+   */
+  throwIfMissing = () => {
+    if (!this.exists) throw new Error(`Directory '${this.pathUnsafe}' does not exist.`);
+    return this as this & { exists: true };
+  };
+
+  /**
    * The path of this Dir instance. Created on file system the first time this property is read/used.
    * Safe to use the directory immediately, without calling mkdir separately.
    */
@@ -58,7 +73,7 @@ export class Dir {
   }
 
   /**
-   * The last segment in the path. Doesn't read this.path, to avoid creating directory on file system before it's needed.
+   * The last segment in the path. Does not create this directory or the new directory on the filesystem.
    * @example
    * const example = new Dir('/path/to/folder');
    * console.log(example.name); // "folder"
@@ -68,7 +83,7 @@ export class Dir {
   }
 
   /**
-   * Create a new Dir inside the current Dir
+   * Create a new Dir inside the current Dir. Does not create this directory or the new directory on the filesystem.
    * @param subPath
    * joined with parent Dir's path to make new Dir
    * @param options
@@ -98,7 +113,7 @@ export class Dir {
   };
 
   /**
-   * Provides the full filepath for a file in this directory (it doesn't need to exist on the filesystem)
+   * Provides the full filepath for a file in this directory (it may not exist on the filesystem yet). This does not create the directory.
    * @param base - The file base (name and extension). Defaults to 'ymd-hms' date if not provided.
    * @param options - optional `{ date: true }` to prefix the filename with 'ymd-hms' date (can also be set in the Dir's options)
    * @example
@@ -114,7 +129,7 @@ export class Dir {
   };
 
   /**
-   * Create a new File instance in this directory.
+   * Create a new File instance in this directory. This does not create the file or this directory.
    * @param base - The file base (name and extension). Defaults to 'ymd-hms' date if not provided.
    * @param options - optional `{ date: true }` to prefix the filename with 'ymd-hms' date (can also be set in the Dir's options)
    */
@@ -123,7 +138,7 @@ export class Dir {
   };
 
   /**
-   * All files and subdirectories in in this directory, returned as Dir and File instances
+   * All files and subdirectories in in this directory, returned as Dir and File instances. Creates this directory if it does not exist yet.
    */
   get contents(): (Dir | File)[] {
     return fs
@@ -132,35 +147,35 @@ export class Dir {
   }
 
   /**
-   * All subdirectories in this directory
+   * All subdirectories in this directory. Creates this directory if it does not exist yet.
    */
   get dirs(): Dir[] {
     return this.contents.filter(f => f instanceof Dir);
   }
 
   /**
-   * All files in this directory
+   * All files in this directory. Creates this directory if it does not exist yet.
    */
   get files(): File[] {
     return this.contents.filter(f => !(f instanceof Dir)) as File[];
   }
 
   /**
-   * All files with MIME type that includes "video"
+   * All files with MIME type that includes "video". Creates this directory if it does not exist yet.
    */
   get videos(): FileVideo[] {
     return this.files.filter(f => f.type?.includes('video')).map(f => new File.video(f.path));
   }
 
   /**
-   * All files with MIME type that includes "image"
+   * All files with MIME type that includes "image". Creates this directory if it does not exist yet.
    */
   get images(): FileImage[] {
     return this.files.filter(f => f.type?.includes('image')).map(f => new File.image(f.path));
   }
 
   /**
-   * All files with ext ".json"
+   * All files with ext ".json". Creates this directory if it does not exist yet.
    * @example
    * // Directory of json files with the same shape
    * const dataFiles = dataDir.jsonFiles.map(f => f.json<ExampleType>());
@@ -171,7 +186,7 @@ export class Dir {
   }
 
   /**
-   * All files with ext ".ndjson"
+   * All files with ext ".ndjson". Creates this directory if it does not exist yet.
    * @example
    * // Directory of ndjson files with the same shape
    * const dataFiles = dataDir.ndjsonFiles.map(f => f.ndjson<ExampleType>());
@@ -182,7 +197,7 @@ export class Dir {
   }
 
   /**
-   * All files with ext ".csv"
+   * All files with ext ".csv". Creates this directory if it does not exist yet.
    * @example
    * // Directory of csv files with the same shape
    * const dataFiles = dataDir.csvFile.map(f => f.csv<ExampleType>());
@@ -193,7 +208,7 @@ export class Dir {
   }
 
   /**
-   * All files with ext ".txt"
+   * All files with ext ".txt". Creates this directory if it does not exist yet.
    */
   get txtFiles(): File[] {
     return this.files.filter(f => f.ext === '.txt');
