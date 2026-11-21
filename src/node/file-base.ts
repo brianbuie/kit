@@ -57,7 +57,7 @@ export class FileBase {
     return fs.existsSync(this.path);
   }
 
-  throwIfMissing = () => {
+  ensureExists = () => {
     if (!this.exists) throw new Error(`File '${this.path}' does not exist.`);
     return this as this & { exists: true };
   };
@@ -106,7 +106,7 @@ export class FileBase {
   /**
    * Create a new File instance at a new location.
    */
-  protected cloneTo = (dir: string | Dir, newBase?: string): this => {
+  protected createInstance = (dir: string | Dir, newBase?: string): this => {
     const newPath = new Path(typeof dir === 'string' ? dir : dir.path).join(newBase || this.base);
     return new (this.constructor as new (filepath: string) => this)(newPath);
   };
@@ -119,7 +119,7 @@ export class FileBase {
    * A new File instance (eg. FileBase, FileJson) at the new location.
    */
   copyTo = (dir: string | Dir, newBase?: string): this => {
-    const newFile = this.cloneTo(dir, newBase);
+    const newFile = this.createInstance(dir, newBase);
     if (this.exists) {
       newFile.prepareWrite();
       fs.copyFileSync(this.path, newFile.path);
@@ -135,7 +135,7 @@ export class FileBase {
    * A new File instance (eg. FileBase, FileJson) at the new location.
    */
   moveTo = (dir: string | Dir, newBase?: string): this => {
-    const newFile = this.cloneTo(dir, newBase);
+    const newFile = this.createInstance(dir, newBase);
     if (this.exists) {
       newFile.prepareWrite();
       fs.renameSync(this.path, newFile.path);

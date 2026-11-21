@@ -63,6 +63,10 @@ export default config;
 
 # Changelog
 
+## 3.10.0
+
+- Renamed `throwIfMissing` to `ensureExists` on both `File` and `Dir` classes.
+
 ## 3.9.2
 
 - New `File.throwIfMissing()` and `Dir.throwIfMissing()` methods to throw an error when a file or directory doesn't exist. It returns `this`, so it can be chained with other methods.

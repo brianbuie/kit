@@ -54,7 +54,7 @@ export class Dir {
   /**
    * Throws an error if the current directory doesn't exist.
    */
-  throwIfMissing = () => {
+  ensureExists = () => {
     if (!this.exists) throw new Error(`Directory '${this.pathUnsafe}' does not exist.`);
     return this as this & { exists: true };
   };
