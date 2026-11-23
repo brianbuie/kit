@@ -1,4 +1,4 @@
-import { isObjectLike } from 'lodash-es';
+import isObjectLike from 'lodash-es/isObjectLike.js';
 
 /**
  * Allows special objects (Error, Headers, Set) to be included in JSON.stringify output. Functions are removed.

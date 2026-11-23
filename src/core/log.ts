@@ -1,4 +1,4 @@
-import { isObjectLike } from 'lodash-es';
+import isObjectLike from 'lodash-es/isObjectLike.js';
 import { inspect } from 'loupe';
 import { default as chalk, type ChalkInstance } from 'chalk';
 import { snapshot } from './snapshot.ts';

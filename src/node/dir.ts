@@ -1,5 +1,5 @@
 import * as fs from 'node:fs';
-import { merge } from 'lodash-es';
+import merge from 'lodash-es/merge.js';
 import trash from 'trash';
 import sanitizeFilename from 'sanitize-filename';
 import { File } from './file.ts';

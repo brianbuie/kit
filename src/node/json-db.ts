@@ -1,4 +1,4 @@
-import { mergeWith } from 'lodash-es';
+import mergeWith from 'lodash-es/mergeWith.js';
 import { File } from './file.ts';
 import { FileJson } from './file-json.ts';
 

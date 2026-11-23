@@ -1,4 +1,5 @@
-import { merge, pick } from 'lodash-es';
+import merge from 'lodash-es/merge.js';
+import pick from 'lodash-es/pick.js';
 import { Log } from './log.ts';
 import { timeout } from './timeout.ts';
 

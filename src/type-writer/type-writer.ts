@@ -1,4 +1,4 @@
-import { merge } from 'lodash-es';
+import merge from 'lodash-es/merge.js';
 import * as qt from 'quicktype-core';
 import { cwd } from '../node/dir.ts';
 import { File } from '../node/file.ts';

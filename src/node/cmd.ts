@@ -1,6 +1,7 @@
 import { spawn, type SpawnOptionsWithoutStdio } from 'child_process';
 import { parseArgsStringToArgv as parseArgs } from 'string-argv';
-import { merge, flattenDeep } from 'lodash-es';
+import merge from 'lodash-es/merge.js';
+import flattenDeep from 'lodash-es/flattenDeep.js';
 
 export type CmdArgs = string | (string | number | null | undefined | CmdArgs)[];
 
