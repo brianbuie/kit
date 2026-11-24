@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { EventEmitter } from 'node:events';
 
 const mocks = vi.hoisted(() => ({
   execFileSync: vi.fn(),
+  spawn: vi.fn(),
   createInterface: vi.fn(),
   question: vi.fn(),
   close: vi.fn(),
@@ -9,7 +11,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('child_process', () => ({
   execFileSync: mocks.execFileSync,
-  spawn: vi.fn(),
+  spawn: mocks.spawn,
 }));
 
 vi.mock('readline/promises', () => ({
@@ -17,6 +19,63 @@ vi.mock('readline/promises', () => ({
 }));
 
 import { Cmd } from './cmd.ts';
+
+describe('Cmd command execution', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it.each(['capture', 'run'] as const)(
+    '%s captures stdout with the existing options and error behavior',
+    async method => {
+      const child = Object.assign(new EventEmitter(), {
+        stdout: new EventEmitter(),
+        stderr: new EventEmitter(),
+      });
+      mocks.spawn.mockReturnValue(child);
+      const result = Cmd[method]('git', ['--version'], { cwd: '/example' });
+      expect(mocks.spawn).toHaveBeenCalledWith('git', ['--version'], { cwd: '/example', timeout: 300000 });
+      child.stdout.emit('data', Buffer.from(' version \n'));
+      child.emit('close', 1, null);
+      await expect(result).resolves.toBe('version');
+
+      const failedChild = Object.assign(new EventEmitter(), {
+        stdout: new EventEmitter(),
+        stderr: new EventEmitter(),
+      });
+      mocks.spawn.mockReturnValue(failedChild);
+      const failure = Cmd[method]('git', []);
+      failedChild.stderr.emit('data', Buffer.from('warning\n'));
+      failedChild.emit('close', 0, null);
+      await expect(failure).rejects.toThrow('warning');
+    },
+  );
+
+  it('pipe inherits stdio and returns the exit code', async () => {
+    const child = new EventEmitter();
+    mocks.spawn.mockReturnValue(child);
+    const result = Cmd.pipe('git', ['add', '-p'], { cwd: '/example' });
+    expect(mocks.spawn).toHaveBeenCalledWith('git', ['add', '-p'], { cwd: '/example', stdio: 'inherit' });
+    child.emit('close', 2, null);
+    await expect(result).resolves.toBe(2);
+  });
+
+  it('pipe rejects when the process is terminated by a signal', async () => {
+    const child = new EventEmitter();
+    mocks.spawn.mockReturnValue(child);
+    const result = Cmd.pipe('git', []);
+    child.emit('close', null, 'SIGTERM');
+    await expect(result).rejects.toThrow('git terminated by SIGTERM');
+  });
+
+  it('pipe rejects when spawning fails', async () => {
+    const child = new EventEmitter();
+    mocks.spawn.mockReturnValue(child);
+    const result = Cmd.pipe('missing-command', []);
+    child.emit('error', new Error('spawn failed'));
+    await expect(result).rejects.toThrow('spawn failed');
+  });
+});
 
 describe('Cmd.promptSecret', () => {
   afterEach(() => {

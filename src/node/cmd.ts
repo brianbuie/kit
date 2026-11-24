@@ -6,11 +6,7 @@ import flattenDeep from 'lodash-es/flattenDeep.js';
 
 export type CmdArgs = string | (string | number | null | undefined | CmdArgs)[];
 
-/**
- * Spawn a child process for shell commands with `Cmd.run('command arg1=something arg2=2...")`
- * @param args can be provided as a string or array of strings
- * @returns Promise that resolves with content of STDOUT. Rejects with output of STDERR
- */
+/** Run commands with arguments supplied as a string or an array. */
 export class Cmd {
   static args = (args: CmdArgs): string[] => {
     return typeof args === 'string'
@@ -70,9 +66,10 @@ export class Cmd {
   };
 
   /**
-   * Spawn child process. If command doesn't include "/", `this.bin` path will be added to the beginning of it.
+   * Capture trimmed stdout from a child process. Rejects if stderr contains non-whitespace text,
+   * regardless of exit code. The default timeout is five minutes.
    */
-  static run = async (cmd: string, args: CmdArgs, opts?: SpawnOptionsWithoutStdio): Promise<string> => {
+  static capture = async (cmd: string, args: CmdArgs, opts?: SpawnOptionsWithoutStdio): Promise<string> => {
     const options = merge({ timeout: 5 * 60 * 1000 }, opts);
     return new Promise((resolve, reject) => {
       let stdout = '';
@@ -92,12 +89,16 @@ export class Cmd {
     });
   };
 
+  /** @deprecated Use `Cmd.capture` instead. */
+  static run = (cmd: string, args: CmdArgs, opts?: SpawnOptionsWithoutStdio): Promise<string> =>
+    this.capture(cmd, args, opts);
+
   /**
    * Run ffmpeg for video processing (ffmpeg needs to be installed separately). ffmpeg location should be in $PATH or `FFMPEG_PATH` environment variable.
    */
   static ffmpeg = async (args: CmdArgs) => {
     const cmd = process.env.FFMPEG_PATH || 'ffmpeg';
-    return this.run(cmd, ['-y', '-loglevel', 'error', args], { timeout: 10 * 60 * 1000 });
+    return this.capture(cmd, ['-y', '-loglevel', 'error', args], { timeout: 10 * 60 * 1000 });
   };
 
   /**
@@ -105,6 +106,6 @@ export class Cmd {
    */
   static ffprobe = async (args: CmdArgs) => {
     const cmd = process.env.FFPROBE_PATH || 'ffprobe';
-    return this.run(cmd, ['-v', 'error', args], { timeout: 10 * 60 * 1000 });
+    return this.capture(cmd, ['-v', 'error', args], { timeout: 10 * 60 * 1000 });
   };
 }

@@ -45,20 +45,11 @@ import { TypeWriter } from '@brianbuie/kit/type-writer';
 export * from './node_modules/@brianbuie/kit/prettier.config.js';
 ```
 
-Or make changes:
-
-```js
-import baseConfig from './node_modules/@brianbuie/kit/prettier.config.js';
-
-const config = {
-  ...baseConfig,
-  printWidth: 80,
-};
-
-export default config;
-```
-
 # Changelog
+
+## 3.10.3
+
+- Rename `Cmd.run` -> `Cmd.capture`. `run` still works, but is marked as deprecated.
 
 ## 3.10.2
 
