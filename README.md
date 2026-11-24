@@ -56,6 +56,10 @@ export * from './node_modules/@brianbuie/kit/prettier.config.js';
 
 - Add `Cmd.promptSecret` to prompt for a secret value. echo is temporarily disabled at TTY level, so it triggers iTerm2 password manager.
 
+## 3.10.1
+
+- Optimize imports from `lodash`
+
 ## 3.10.0
 
 - Renamed `throwIfMissing` to `ensureExists` on both `File` and `Dir` classes.
