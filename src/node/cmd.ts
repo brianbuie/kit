@@ -1,4 +1,5 @@
-import { spawn, type SpawnOptionsWithoutStdio } from 'child_process';
+import { spawn, execFileSync, type SpawnOptionsWithoutStdio } from 'child_process';
+import { createInterface } from 'readline/promises';
 import { parseArgsStringToArgv as parseArgs } from 'string-argv';
 import merge from 'lodash-es/merge.js';
 import flattenDeep from 'lodash-es/flattenDeep.js';
@@ -34,6 +35,38 @@ export class Cmd {
         resolve(code ?? 0);
       });
     });
+  };
+
+  /**
+   * Prompt for a secret value, like password. Temporarily disables echo at the TTY level, to trigger password manager in iTerm2.
+   * SIGINT (Ctrl+C) will exit prompt without exiting process. Be sure to handle empty output.
+   */
+  static promptSecret = async (prompt: string) => {
+    const stty = (...args: string[]): string =>
+      execFileSync('stty', args, {
+        stdio: ['inherit', 'pipe', 'inherit'],
+        encoding: 'utf8',
+      }).trim();
+    const original = stty('-g');
+    const rl = createInterface({
+      input: process.stdin,
+      terminal: false,
+    });
+    const controller = new AbortController();
+    const onInterrupt = () => controller.abort();
+    process.once('SIGINT', onInterrupt);
+    try {
+      stty('-echo');
+      process.stdout.write(prompt);
+      return await rl.question('', {
+        signal: controller.signal,
+      });
+    } finally {
+      stty(original);
+      rl.close();
+      process.removeListener('SIGINT', onInterrupt);
+      process.stdout.write('\n');
+    }
   };
 
   /**

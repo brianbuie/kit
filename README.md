@@ -1,6 +1,3 @@
-> [!NOTE]
-> AI has assisted with debugging and writing tests for the modules in this package. The actual code was written by a dumb person.
-
 # Kit
 
 Basic tools for quick projects
@@ -62,6 +59,10 @@ export default config;
 ```
 
 # Changelog
+
+## 3.10.2
+
+- Add `Cmd.promptSecret` to prompt for a secret value. echo is temporarily disabled at TTY level, so it triggers iTerm2 password manager.
 
 ## 3.10.0
 
