@@ -50,6 +50,7 @@ export * from './node_modules/@brianbuie/kit/prettier.config.js';
 ## 3.10.3
 
 - Rename `Cmd.run` -> `Cmd.capture`. `run` still works, but is marked as deprecated.
+- `Cmd.promptSecret` -> `Cmd.secret`
 
 ## 3.10.2
 

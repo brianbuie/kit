@@ -77,7 +77,7 @@ describe('Cmd command execution', () => {
   });
 });
 
-describe('Cmd.promptSecret', () => {
+describe('Cmd.secret', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -96,7 +96,7 @@ describe('Cmd.promptSecret', () => {
     mocks.question.mockResolvedValue('secret');
     const write = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
 
-    await expect(Cmd.promptSecret('Password: ')).resolves.toBe('secret');
+    await expect(Cmd.secret('Password: ')).resolves.toBe('secret');
 
     expect(mocks.execFileSync.mock.calls.map(([, args]) => args)).toEqual([['-g'], ['-echo'], ['original-state']]);
     expect(mocks.createInterface).toHaveBeenCalledWith({
@@ -119,7 +119,7 @@ describe('Cmd.promptSecret', () => {
     );
     const write = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
     const interruptListeners = process.listenerCount('SIGINT');
-    const prompt = Cmd.promptSecret('Password: ');
+    const prompt = Cmd.secret('Password: ');
 
     process.emit('SIGINT');
 

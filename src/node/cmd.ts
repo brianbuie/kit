@@ -37,7 +37,7 @@ export class Cmd {
    * Prompt for a secret value, like password. Temporarily disables echo at the TTY level, to trigger password manager in iTerm2.
    * SIGINT (Ctrl+C) will exit prompt without exiting process. Be sure to handle empty output.
    */
-  static promptSecret = async (prompt: string) => {
+  static secret = async (prompt: string) => {
     const stty = (...args: string[]): string =>
       execFileSync('stty', args, {
         stdio: ['inherit', 'pipe', 'inherit'],
