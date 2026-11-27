@@ -47,6 +47,10 @@ export * from './node_modules/@brianbuie/kit/prettier.config.js';
 
 # Changelog
 
+## 3.10.4
+
+- Un-deprecate `Cmd.run`, will keep it as an alias for `Cmd.capture`.
+
 ## 3.10.3
 
 - Rename `Cmd.run` -> `Cmd.capture`. `run` still works, but is marked as deprecated.

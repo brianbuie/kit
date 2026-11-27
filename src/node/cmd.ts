@@ -89,7 +89,7 @@ export class Cmd {
     });
   };
 
-  /** @deprecated Use `Cmd.capture` instead. */
+  /** alias for `Cmd.capture` */
   static run = (cmd: string, args: CmdArgs, opts?: SpawnOptionsWithoutStdio): Promise<string> =>
     this.capture(cmd, args, opts);
 
