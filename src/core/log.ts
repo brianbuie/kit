@@ -97,7 +97,7 @@ export class Log {
     if (Log.silent || LogLevels[level] < Log.minLevel) return;
     if (Log.isBrowser) return Log.toBrowser(entry);
     if (Log.isGcloud) return Log.toGcloud(entry);
-    if (!Log.isProd) return Log.toPretty(entry);
+    if (!Log.isProd || Env.get('LOG_FORMAT') === 'PRETTY') return Log.toPretty(entry);
     console.log(JSON.stringify(entry));
   };
 

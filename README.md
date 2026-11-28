@@ -47,6 +47,10 @@ export * from './node_modules/@brianbuie/kit/prettier.config.js';
 
 # Changelog
 
+## 3.10.5
+
+- `LOG_FORMAT=PRETTY` env variable to force pretty logging, because `NODE_ENV=production` changes format to json.
+
 ## 3.10.4
 
 - Un-deprecate `Cmd.run`, will keep it as an alias for `Cmd.capture`.
